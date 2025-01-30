@@ -3,4 +3,8 @@
   "version": "0.0.1",
   "exports": "./mod.ts",
   "license": "MIT",
+  "imports": {
+    "@ts-morph/ts-morph": "jsr:@ts-morph/ts-morph@^25.0.0",
+    "typescript": "npm:typescript@^5.7.3"
+  }
 }

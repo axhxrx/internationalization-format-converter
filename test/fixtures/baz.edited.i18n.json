@@ -1,0 +1,18 @@
+{
+  "favorite": {
+    "food": {
+      "en": "pizza",
+      "ja": "ピザ"
+    },
+    "drink": {
+      "alcoholic": {
+        "en": "wine",
+        "ja": "ワイン"
+      },
+      "nonAlcoholic": {
+        "en": "milk",
+        "ja": "牛乳"
+      }
+    }
+  }
+}
