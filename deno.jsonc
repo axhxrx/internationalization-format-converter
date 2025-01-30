@@ -1,0 +1,6 @@
+{
+  "name": "@axhxrx/internationalization-format-converter",
+  "version": "0.0.1",
+  "exports": "./mod.ts",
+  "license": "MIT",
+}
