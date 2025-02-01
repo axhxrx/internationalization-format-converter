@@ -4,6 +4,9 @@
   "exports": "./mod.ts",
   "license": "MIT",
   "imports": {
+    "@axhxrx/dprint-config": "jsr:@axhxrx/dprint-config@^0.0.5",
+    "@axhxrx/internationalization": "jsr:@axhxrx/internationalization@^0.0.8",
+    "@dprint/formatter": "jsr:@dprint/formatter@^0.4.1",
     "@ts-morph/ts-morph": "jsr:@ts-morph/ts-morph@^25.0.0",
     "typescript": "npm:typescript@^5.7.3"
   }
