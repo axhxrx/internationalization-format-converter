@@ -1,0 +1,52 @@
+{
+  "foo": {
+    "name": {
+      "en": "Mason",
+      "ja": "メイソン"
+    },
+    "greeting": {
+      "friendly": {
+        "en": "Hello, {name}!",
+        "ja": "こんにちは、{name}さん！"
+      },
+      "hostile": {
+        "en": "Get lost, {name}!",
+        "ja": "何だ、{name}！"
+      }
+    }
+  },
+  "bar": {
+    "nickname": {
+      "en": "Princess",
+      "ja": "プリンセス"
+    },
+    "greeting": {
+      "friendly": {
+        "en": "Greetings, exalted {name}!",
+        "ja": "こんにちは、{name}様！"
+      },
+      "hostile": {
+        "en": "You do not look like royalty, {name}!",
+        "ja": "おまえはプリンセスぽくねぇ、{name}！"
+      }
+    }
+  },
+  "baz": {
+    "favorite": {
+      "food": {
+        "en": "pizza",
+        "ja": "ピザ"
+      },
+      "drink": {
+        "alcoholic": {
+          "en": "whiskey",
+          "ja": "ウイスキー"
+        },
+        "nonAlcoholic": {
+          "en": "water",
+          "ja": "水"
+        }
+      }
+    }
+  }
+}

@@ -1,17 +1,19 @@
 {
-  "favorite": {
-    "food": {
-      "en": "pizza",
-      "ja": "ピザ"
-    },
-    "drink": {
-      "alcoholic": {
-        "en": "wine",
-        "ja": "ワイン"
+  "baz": {
+    "favorite": {
+      "food": {
+        "en": "pizza",
+        "ja": "ピザ"
       },
-      "nonAlcoholic": {
-        "en": "milk",
-        "ja": "牛乳"
+      "drink": {
+        "alcoholic": {
+          "en": "wine",
+          "ja": "ワイン"
+        },
+        "nonAlcoholic": {
+          "en": "milk",
+          "ja": "牛乳"
+        }
       }
     }
   }
