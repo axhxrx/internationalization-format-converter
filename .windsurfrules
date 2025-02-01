@@ -1,0 +1,5 @@
+1. We use Deno 2.
+2. We prefer single quotes for strings and Allman braces for multiline code blocks.
+3. We want to use jsr.io and not NPM, whenever possible.
+4. We publish this library to JSR.io.
+5. We like JSDoc comments to only use asterisks on the opening and closing of the block, and no leading asterisks on the inside.
