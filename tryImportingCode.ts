@@ -4,12 +4,11 @@ type ImportOptionsWithSource = {
 };
 
 type ImportOptionsWithPath = {
-  sourceCode?: never; 
+  sourceCode?: never;
   filePath: string;
 };
 
 type ImportOptions = ImportOptionsWithSource | ImportOptionsWithPath;
-
 
 interface ImportResult
 {
@@ -17,11 +16,12 @@ interface ImportResult
   filePath?: string;
   sourceCode: string;
   error?: Error;
+  module?: unknown;
 }
 
 export async function tryImportingCode(options: ImportOptions): Promise<ImportResult>
 {
-  let sourceCode: string = "ERROR: sourceCode could not be read, probably due to an error during or before read";
+  let sourceCode: string = 'ERROR: sourceCode could not be read, probably due to an error during or before read';
   let tempFile: string | undefined;
 
   try
@@ -30,7 +30,7 @@ export async function tryImportingCode(options: ImportOptions): Promise<ImportRe
     if (options.sourceCode)
     {
       sourceCode = options.sourceCode;
-      
+
       // Create temp file for source code
       tempFile = await Deno.makeTempFile({
         prefix: 'import-test-',
@@ -49,12 +49,14 @@ export async function tryImportingCode(options: ImportOptions): Promise<ImportRe
     }
 
     // Try importing the file
-    await import(`file://${tempFile}`);
+    const realPath = await Deno.realPath(tempFile);
+    const module = await import(`file://${realPath}`);
 
     return {
       success: true,
       filePath: options.filePath,
       sourceCode,
+      module,
     };
   }
   catch (error)
