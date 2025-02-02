@@ -8,7 +8,7 @@
       "request": "launch",
       "name": "Launch Program",
       "type": "node",
-      "program": "${workspaceFolder}/importI18nFileOrThrow.ts",
+      "program": "${workspaceFolder}/loadLocalizationFromFile.ts",
       "cwd": "${workspaceFolder}",
       "env": {},
       "runtimeExecutable": "/Users/mason/.deno/bin/deno",
