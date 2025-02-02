@@ -32,4 +32,18 @@ export const hoge = {
       foo,
     },
   },
+  nested2: {
+    nickname: bar.nickname,
+    moreDeeplyNested: {
+      foo,
+      wowser: {
+        en:
+          'The nested property should be completely erased becuase it contains nothing but import references, but nested2 should remain because I, wowser, exist',
+        ja: 'なんか、俺いるぞ',
+      },
+    },
+  },
 } as const;
+
+export const reExportedFoo = foo;
+export * from './baz.i18n.ts';

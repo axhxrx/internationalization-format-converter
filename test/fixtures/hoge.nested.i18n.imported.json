@@ -1,0 +1,28 @@
+{
+  "hoge": {
+    "favorite": {
+      "food": {
+        "en": "pizza",
+        "ja": "ピザ"
+      },
+      "drink": {
+        "alcoholic": {
+          "en": "whiskey",
+          "ja": "ウイスキー"
+        },
+        "nonAlcoholic": {
+          "en": "water",
+          "ja": "水"
+        }
+      }
+    },
+    "nested2": {
+      "moreDeeplyNested": {
+        "wowser": {
+          "en": "The nested property should be completely erased becuase it contains nothing but import references, but nested2 should remain because I, wowser, exist",
+          "ja": "なんか、俺いるぞ"
+        }
+      }
+    }
+  }
+}
