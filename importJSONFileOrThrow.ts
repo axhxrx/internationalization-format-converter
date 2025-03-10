@@ -30,48 +30,4 @@ export const importJSONOrThrow = async (jsonText: string, tsCode: string) =>
 
   const updatedCode = applyDifferencesUsingASTOrThrow(differences, tsCode);
   return updatedCode;
-
-  // return formatTypeScriptCode(updatedCode);
-
-  // console.log('differences', differences);
-
-  // return differences;
-
-  // for (const difference of differences) {
-  //   console.log('difference', difference);
-  // }
-
-  // const modulePath = json;
-  // const i18n = await import(modulePath);
-
-  // const entries = Object.entries(i18n);
-
-  // for (const [key, value] of entries) {
-  //   if (typeof value === 'object' && value !== null) {
-  //     const validateI18nObject = (obj: unknown): boolean => {
-  //       if (typeof obj !== 'object' || obj === null) {
-  //         return false;
-  //       }
-
-  //       // If it's a leaf node (has 'en' or 'ja' keys)
-  //       if ('en' in obj || 'ja' in obj) {
-  //         return isI18nItem(obj);
-  //       }
-
-  //       // If it's a nested object, recursively check all values
-  //       return Object.values(obj).every(val => validateI18nObject(val));
-  //     };
-
-  //     if (!validateI18nObject(value)) {
-  //       throw new Error(`Invalid i18n structure in key "${key}"`);
-  //     }
-  //   } else {
-  //     throw new Error(`Invalid i18n structure: value must be an object`);
-  //   }
-
-  //   // const j = JSON.stringify(i18n, null, 2);
-  //   // console.log('JSON:', j);
-
-  //   return i18n;
-  // }
 };

@@ -11,7 +11,7 @@
       "program": "${workspaceFolder}/loadLocalizationFromFile.ts",
       "cwd": "${workspaceFolder}",
       "env": {},
-      "runtimeExecutable": "/Users/mason/.deno/bin/deno",
+      "runtimeExecutable": "${env:HOME}/.deno/bin/deno",
       "runtimeArgs": [
         "run",
         "--unstable",
@@ -22,17 +22,43 @@
     },
     {
       "request": "launch",
-      "name": "Debug Program",
+      "name": "Debug tests",
       "type": "node",
       "program": "${fileDirname}/${fileBasename}",
       "cwd": "${workspaceFolder}",
       "env": {},
-      "runtimeExecutable": "/Users/mason/.deno/bin/deno",
+      "runtimeExecutable": "${env:HOME}/.deno/bin/deno",
       "runtimeArgs": [
         "test",
         "--allow-read",
-        "--inspect-wait",
         "--allow-write",
+        "--unstable-sloppy-imports",
+        "--inspect-wait",
+        "--allow-env"
+      ],
+      "attachSimplePort": 9229
+    },
+    {
+      "request": "launch",
+      "name": "Debug mod.ts w args",
+      "type": "node",
+      "program": "${workspaceFolder}/mod.ts",
+      "cwd": "${workspaceFolder}",
+      "env": {},
+      "runtimeExecutable": "${env:HOME}/.deno/bin/deno",
+      "runtimeArgs": [
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--unstable-sloppy-imports",
+        "--inspect-wait",
+        "--allow-env"
+      ],
+      "args": [
+        "export",
+        "FIXME-PUT-WHATEVER-YOU-WANT-TO-DEBUG-HERE",
+        "foo.json",
+        "--dry-run"
       ],
       "attachSimplePort": 9229
     }

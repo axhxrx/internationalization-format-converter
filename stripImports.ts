@@ -88,7 +88,8 @@ function removeImportsAndUsages(sourceFile: ts.SourceFile): ts.SourceFile
         }
 
         // Remove export variable statements where all declarations reference imported identifiers
-        if (ts.isVariableStatement(node) && node.modifiers && node.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword))
+        if (ts.isVariableStatement(node) && node.modifiers
+          && node.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword))
         {
           const declarations = node.declarationList.declarations;
           if (declarations.every(decl => decl.initializer && isImportedReference(decl.initializer)))
@@ -143,6 +144,18 @@ function removeImportsAndUsages(sourceFile: ts.SourceFile): ts.SourceFile
           }
           return node;
         }
+        
+        // Handle type assertion expressions (e.g., `as const`)
+        if (ts.isAsExpression(node)) {
+          const expression = ts.visitNode(node.expression, visit) as ts.Expression;
+          if (!expression) {
+            return undefined;
+          }
+          if (expression !== node.expression) {
+            return factory.createAsExpression(expression, node.type);
+          }
+          return node;
+        }
 
         return ts.visitEachChild(node, visit, context);
       }
@@ -169,7 +182,16 @@ export const stripImports = async (sourceCode: string): Promise<string> =>
   );
 
   // Perform the transformation
-  const transformedSourceFile = removeImportsAndUsages(sourceFile);
+  let transformedSourceFile: ts.SourceFile;
+  try
+  {
+    transformedSourceFile = removeImportsAndUsages(sourceFile);
+  }
+  catch (error)
+  {
+    console.error('Error during transformation:', error);
+    throw error;
+  }
 
   // Convert the transformed AST back to code
   const printer = ts.createPrinter();
@@ -182,7 +204,7 @@ export const stripImports = async (sourceCode: string): Promise<string> =>
 
 if (import.meta.main)
 {
-    const path = './test/fixtures/hoge.re-exports.i18n.ts';
-    const foo = await stripImports(Deno.readTextFileSync(path));
-    console.log(foo);
+  const path = './test/fixtures/hoge.re-exports.i18n.ts';
+  const foo = await stripImports(Deno.readTextFileSync(path));
+  console.log(foo);
 }

@@ -25,19 +25,23 @@ The tool provides a command-line interface for converting between formats:
 
 ```bash
 # Export a TypeScript file to JSON
-deno run -RW mod.ts export path/to/file.i18n.ts output.json
+deno run -RWE mod.ts export path/to/file.i18n.ts output.json
 
 # Import translations from JSON back to TypeScript
-deno run -RW mod.ts import input.json path/to/file.i18n.ts
+deno run -RWE mod.ts import input.json path/to/file.i18n.ts
 
 # Export with file path as the root identifier
-deno run -RW mod.ts export path/to/file.i18n.ts output.json --derive
+deno run -RWE mod.ts export path/to/file.i18n.ts output.json --derive
 
 # Export with a custom root identifier
-deno run -RW mod.ts export path/to/file.i18n.ts output.json --identifier=customName
+deno run -RWE mod.ts export path/to/file.i18n.ts output.json --identifier=customName
+
+# Preview changes without writing files (dry run)
+deno run -RWE mod.ts import input.json path/to/file.i18n.ts --dry-run
+deno run -RWE mod.ts export path/to/file.i18n.ts output.json --dry-run
 
 # Display help
-deno run -RW mod.ts help
+deno run -RWE mod.ts help
 ```
 
 ### API

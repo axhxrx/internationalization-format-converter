@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
-import { DiffResult } from './DiffResult.ts';
+import type { DiffResult } from './DiffResult.ts';
 import { loadLocalizationFileContents } from './loadLocalizationFromFile.ts';
 import { stripImports } from './stripImports.ts';
 
