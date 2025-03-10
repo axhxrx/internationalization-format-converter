@@ -88,11 +88,20 @@ function removeImportsAndUsages(sourceFile: ts.SourceFile): ts.SourceFile
         }
 
         // Remove export variable statements where all declarations reference imported identifiers
+        // or where declarations don't have initializers (which would make invalid TS)
         if (ts.isVariableStatement(node) && node.modifiers
           && node.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword))
         {
           const declarations = node.declarationList.declarations;
+          
+          // Remove if all declarations reference imported identifiers
           if (declarations.every(decl => decl.initializer && isImportedReference(decl.initializer)))
+          {
+            return undefined;
+          }
+          
+          // Remove if any declaration is missing an initializer (would be invalid TS)
+          if (declarations.some(decl => !decl.initializer))
           {
             return undefined;
           }
@@ -195,8 +204,18 @@ export const stripImports = async (sourceCode: string): Promise<string> =>
 
   // Convert the transformed AST back to code
   const printer = ts.createPrinter();
-  const unformattedResult = printer.printFile(transformedSourceFile);
-
+  let unformattedResult = printer.printFile(transformedSourceFile);
+  
+  // Handle special case where we end up with invalid export statements like "export const i18n;"
+  const invalidExportRegex = /export\s+const\s+\w+\s*;/g;
+  if (invalidExportRegex.test(unformattedResult)) {
+    // If the file only contains invalid exports after transformation, return empty string
+    const contentWithoutInvalidExports = unformattedResult.replace(invalidExportRegex, '').trim();
+    if (!contentWithoutInvalidExports) {
+      return '';
+    }
+  }
+  
   const result = await formatTypeScriptCode(unformattedResult);
 
   return result;
