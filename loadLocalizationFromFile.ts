@@ -58,7 +58,7 @@ export const loadLocalizationFromFile = async (
 
   if (!importResult.success)
   {
-    console.error(`Failed to import file ${filePath}: ${importResult}`);
+    console.error(`Failed to import file ${filePath}: ${Deno.inspect(importResult)}`);
     throw new Error(`Failed to import file ${filePath}: ${importResult.error?.message ?? 'unknown error'}`);
   }
 

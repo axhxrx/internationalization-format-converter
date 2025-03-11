@@ -27,4 +27,4 @@ export const derpola = {
 export const hoge2 = { fooI18n, barI18n, hoge };
 export const hoge3 = hoge;
 
-aass;
+// aass;
