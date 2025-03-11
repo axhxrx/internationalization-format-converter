@@ -206,12 +206,44 @@ export const stripImports = async (sourceCode: string): Promise<string> =>
   const printer = ts.createPrinter();
   let unformattedResult = printer.printFile(transformedSourceFile);
   
-  // Handle special case where we end up with invalid export statements like "export const i18n;"
+  // Handle special cases where we end up with invalid export statements
+  
+  // Case 1: Simple invalid export statements like "export const i18n;"
   const invalidExportRegex = /export\s+const\s+\w+\s*;/g;
-  if (invalidExportRegex.test(unformattedResult)) {
-    // If the file only contains invalid exports after transformation, return empty string
-    const contentWithoutInvalidExports = unformattedResult.replace(invalidExportRegex, '').trim();
-    if (!contentWithoutInvalidExports) {
+  
+  // Case 2: Spread syntax with undefined variables like "...ActivateLagoonV2ModalComponentTranslations,"
+  const invalidSpreadRegex = /\.\.\.\w+,?\s*(?=\n|\.\.\.|\})/g;
+  
+  // Case 3: Object with only spreads that will all be invalid (pattern like export const x = {...a, ...b};)
+  const objectWithOnlySpreadsRegex = /export\s+const\s+\w+\s*=\s*\{\s*(?:\.\.\.\w+,?\s*)+\}\s*;?/g;
+  
+  // For files that contain spreads that reference imports (which will be undefined after our transform),
+  // we'll need a more aggressive approach - especially for complex files like master translation files
+  
+  // First detect if the file has spread syntax
+  if (invalidSpreadRegex.test(unformattedResult)) {
+    // If we have an object that's mostly or all made up of spreads from imported variables, 
+    // just return an empty string rather than try to salvage parts
+    // Check for complex spread pattern in an export object
+    const exportWithSpreadsRegex = /export\s+const\s+\w+\s*=\s*\{[\s\S]*?\.\.\.\w+[\s\S]*?\}/;
+    if (exportWithSpreadsRegex.test(unformattedResult)) {
+      return '';
+    }
+  }
+  
+  // Check if we need to remove invalid exports
+  if (invalidExportRegex.test(unformattedResult) || 
+      invalidSpreadRegex.test(unformattedResult) ||
+      objectWithOnlySpreadsRegex.test(unformattedResult)) {
+    
+    // First, try to remove entire objects that only contain spreads
+    unformattedResult = unformattedResult.replace(objectWithOnlySpreadsRegex, '');
+    
+    // Then remove any remaining simple invalid exports 
+    unformattedResult = unformattedResult.replace(invalidExportRegex, '');
+    
+    // If the file is now empty or only contains whitespace, return empty string
+    if (!unformattedResult.trim()) {
       return '';
     }
   }
