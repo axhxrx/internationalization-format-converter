@@ -3,10 +3,6 @@ import { walk } from 'jsr:@std/fs';
 import { join } from 'jsr:@std/path';
 
 import { loadLocalizationFromFile } from '../loadLocalizationFromFile.ts';
-// These imports aren't used in the test
-// import { stripImports } from '../stripImports.ts';
-// import { tryImportingCode } from '../tryImportingCode.ts';
-
 const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;
 const pathToCollection = join(pathToFixtures, 'collection');
 
