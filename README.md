@@ -1,3 +1,19 @@
+# @axhxrx/internationalization-format-converter
+
+This library is a WIP hack for converting between TypeScript localization files (as defined by [@axhxrx/internationalization](https://jsr.io/@axhxrx/internationalization)) and JSON.
+
+It's still at the is-it-workable ideation stage, so you probably shouldn't use it yet. 
+
+The purpose here is to be able to use the TypeScript format defined by [@axhxrx/internationalization](https://jsr.io/@axhxrx/internationalization), but automate integrations with other services, which generally only support JSON. This library can (at least sometimes) convert the `.ts` format to JSON, and then update the original `.ts` file with the changes from newer JSON files.
+
+If it proves workable, then this library will be further updated in the future. Until such time, here's some LLM spew about the current state of affairs:
+
+## Requires `--unstable-sloppy-imports` flag
+
+NOTE: Because this library uses Deno's capacity to import arbitrary files, it requires the `--unstable-sloppy-imports` flag if you want to use it with TypeScript files that don't use non-insane imports. (That is, if your imports within the TypeScript code omit the ".ts" file extension, as is still the prevailing practice in 2025 with Node.js projects).
+
+----
+
 # Internationalization Format Converter
 
 A tool for converting between TypeScript (*.i18n.ts) localization files and JSON.
@@ -9,14 +25,6 @@ A tool for converting between TypeScript (*.i18n.ts) localization files and JSON
 - Support for multiple files with custom or derived identifiers
 - Preserves code style and formatting when updating TypeScript files
 
-## Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/internationalization-format-converter.git
-cd internationalization-format-converter
-```
-
 ## Usage
 
 ### CLI
@@ -24,24 +32,27 @@ cd internationalization-format-converter
 The tool provides a command-line interface for converting between formats:
 
 ```bash
+
+export MOD="https://jsr.io/@axhxrx/internationalization-format-converter/0.0.1/mod.ts"
+
 # Export a TypeScript file to JSON
-deno run -RWE mod.ts export path/to/file.i18n.ts output.json
+deno run -RWE --unstable-sloppy-imports $MOD export path/to/file.i18n.ts output.json
 
 # Import translations from JSON back to TypeScript
-deno run -RWE mod.ts import input.json path/to/file.i18n.ts
+deno run -RWE --unstable-sloppy-imports $MOD import input.json path/to/file.i18n.ts
 
 # Export with file path as the root identifier
-deno run -RWE mod.ts export path/to/file.i18n.ts output.json --derive
+deno run -RWE --unstable-sloppy-imports $MOD export path/to/file.i18n.ts output.json --derive
 
 # Export with a custom root identifier
-deno run -RWE mod.ts export path/to/file.i18n.ts output.json --identifier=customName
+deno run -RWE --unstable-sloppy-imports $MOD export path/to/file.i18n.ts output.json --identifier=customName
 
 # Preview changes without writing files (dry run)
-deno run -RWE mod.ts import input.json path/to/file.i18n.ts --dry-run
-deno run -RWE mod.ts export path/to/file.i18n.ts output.json --dry-run
+deno run -RWE --unstable-sloppy-imports $MOD import input.json path/to/file.i18n.ts --dry-run
+deno run -RWE --unstable-sloppy-imports $MOD export path/to/file.i18n.ts output.json --dry-run
 
 # Display help
-deno run -RWE mod.ts help
+deno run -RWE --unstable-sloppy-imports $MOD help
 ```
 
 ### API
@@ -69,9 +80,9 @@ await Deno.writeTextFile("path/to/file.i18n.ts", updatedTsCode);
 
 ```bash
 # Run tests
-deno test
+deno test --allow-read --allow-write --allow-env --unstable-sloppy-imports
 ```
 
 ## License
 
-Copyright &copy; 2025 axhxrx
+MIT
