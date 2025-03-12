@@ -2,7 +2,6 @@ import { join } from '@std/path';
 
 import { assert } from 'jsr:@std/assert';
 
-import { loadLocalizationFromFile } from '../loadLocalizationFromFile.ts';
 import { stripImports } from '../stripImports.ts';
 import { tryImportingCode } from '../tryImportingCode.ts';
 
@@ -10,11 +9,11 @@ const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;
 
 Deno.test('Regression test for crashing bug on certain .i18n.ts files', async () =>
 {
-  // This test fails because our export generates invalid code like:
+  // This test used to fail because our export generated invalid code like:
   //   export const userConsoleMasterTranslations = {
   //   ...ActivateLagoonV2ModalComponentTranslations,
-  //   ...AddLagoonUserModalComponentTranslations,
-  //   ...AddSoraletModalComponentTranslations,
+  //   ...AddShplagoonUserModalComponentTranslations,
+  //   ...AddQuoraletModalComponentTranslations,
   //   ...AlertTranslations,
   //   ...CancelTransferSimOperatorComponentTranslations,
   //   // TONS MORE LINES LIKE THIS
@@ -26,26 +25,33 @@ Deno.test('Regression test for crashing bug on certain .i18n.ts files', async ()
   const modulePath = join(pathToFixtures, 'collection', 'libs', 'i18n', 'component', 'user-console', 'src', 'lib',
     'user-console-master-translations.i18n.ts');
 
-  try {
+  try
+  {
     // First try the normal way to load the file - this will probably fail
     const fileContents = await Deno.readTextFile(modulePath);
     const strippedContents = await stripImports(fileContents);
-    
-    console.log("Stripped contents:", strippedContents.length > 100 ? strippedContents.slice(0, 100) + "..." : strippedContents);
-    
+
+    console.log('Stripped contents:',
+      strippedContents.length > 100 ? strippedContents.slice(0, 100) + '...' : strippedContents);
+
     // If strippedContents is empty, we should consider the test passing
-    if (strippedContents.trim() === '') {
+    if (strippedContents.trim() === '')
+    {
       console.log('Empty stripped contents is valid for this test case');
-    } else {
+    }
+    else
+    {
       const y = await tryImportingCode({ sourceCode: strippedContents });
-      console.log(
-        'Successfully imported stripped contents: ',
-        Deno.inspect(y, { depth: Infinity, colors: true }),
-      );
+      // console.log(
+      //   'Successfully imported stripped contents: ',
+      //   Deno.inspect(y, { depth: Infinity, colors: true }),
+      // );
       assert(y.success, 'Importing stripped contents should work');
     }
-  } catch (error) {
-    console.error("Error:", error);
+  }
+  catch (error)
+  {
+    console.error('Error:', error);
     assert(false, 'Should not throw an error');
   }
 });

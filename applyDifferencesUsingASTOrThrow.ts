@@ -1,5 +1,16 @@
-import type { Expression, ObjectLiteralExpression, StringLiteral, VariableStatement } from '@ts-morph/ts-morph';
-import { IndentationText, NewLineKind, Project, QuoteKind, SyntaxKind } from '@ts-morph/ts-morph';
+import type {
+  Expression,
+  ObjectLiteralExpression,
+  StringLiteral,
+  VariableStatement,
+} from '@ts-morph/ts-morph';
+import {
+  IndentationText,
+  NewLineKind,
+  Project,
+  QuoteKind,
+  SyntaxKind,
+} from '@ts-morph/ts-morph';
 import type { DiffResult } from './DiffResult.ts';
 
 function getExportedVariableNamesAndValues(
@@ -141,7 +152,7 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
   function findAndModify(
     objExpr: ObjectLiteralExpression,
     path: string[],
-    newValue: string
+    newValue: string,
   ): void
   {
     if (path.length === 0) return;
@@ -182,7 +193,7 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
       findAndModify(
         unwrappedInitializer as ObjectLiteralExpression,
         remainingPath,
-        newValue
+        newValue,
       );
     }
     else

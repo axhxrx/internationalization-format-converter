@@ -2,7 +2,7 @@ import { join } from '@std/path';
 
 import { assert, assertGreater } from 'jsr:@std/assert';
 
-import { loadLocalizationFromFile } from '../loadLocalizationFromFile.ts';
+import { loadLocalizationFromFileOrThrow } from '../loadLocalizationFromFile.ts';
 import { stripImports } from '../stripImports.ts';
 
 const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;
@@ -19,7 +19,7 @@ Deno.test('Do we have any bugs over-eagerly removing exports?', async () =>
 
   assertGreater(strippedContents.length, 0, 'Stripped contents should not be empty');
 
-  const loaded = await loadLocalizationFromFile(modulePath);
+  const loaded = await loadLocalizationFromFileOrThrow(modulePath);
 
   assert(loaded !== null, 'Loaded should not be null');
 

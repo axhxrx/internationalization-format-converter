@@ -5,7 +5,8 @@
 
  NOTE: When applying to diff, the `right` value is the new value, and the `left` value is the old value. (Might be renamed in the future to better reflect that.)
  */
-export interface DiffResult {
+export interface DiffResult
+{
   [key: string]: {
     left?: string;
     right?: string;

@@ -1,7 +1,7 @@
 import { join } from '@std/path';
 import { assert, assertEquals } from 'jsr:@std/assert';
 import { importJSONOrThrow } from '../importJSONFileOrThrow.ts';
-import { loadLocalizationFromFile } from '../loadLocalizationFromFile.ts';
+import { loadLocalizationFromFileOrThrow } from '../loadLocalizationFromFile.ts';
 
 const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;
 
@@ -23,10 +23,10 @@ Deno.test('fromJSON converts input file to expected JSON (foo)', async () =>
   await Deno.copyFile(bazInputFile, join(tmpDir, 'baz.i18n.ts'));
   await Deno.copyFile(hogeInputFile, join(tmpDir, 'hoge.nested.i18n.ts'));
 
-  const foo = await loadLocalizationFromFile(join(tmpDir, 'foo.i18n.ts'), { derive: true });
-  const bar = await loadLocalizationFromFile(join(tmpDir, 'bar.i18n.ts'), { derive: true });
-  const baz = await loadLocalizationFromFile(join(tmpDir, 'baz.i18n.ts'), { derive: true });
-  const hoge = await loadLocalizationFromFile(join(tmpDir, 'hoge.nested.i18n.ts'), { derive: true });
+  const foo = await loadLocalizationFromFileOrThrow(join(tmpDir, 'foo.i18n.ts'), { derive: true });
+  const bar = await loadLocalizationFromFileOrThrow(join(tmpDir, 'bar.i18n.ts'), { derive: true });
+  const baz = await loadLocalizationFromFileOrThrow(join(tmpDir, 'baz.i18n.ts'), { derive: true });
+  const hoge = await loadLocalizationFromFileOrThrow(join(tmpDir, 'hoge.nested.i18n.ts'), { derive: true });
   const all = {
     ...foo.module,
     ...bar.module,

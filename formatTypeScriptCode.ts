@@ -11,7 +11,7 @@ const getFormatter = async () =>
   if (tsFormatter === undefined)
   {
     // Get the URL to reference the WASM file, as we need the raw WebAssembly.Module
-    const wasmUrl = new URL('./typescript-0.93.3.wasm', import.meta.url);
+    const wasmUrl = new URL('./typescript-0.94.0.wasm', import.meta.url);
 
     const globalConfig: GlobalConfiguration = {
       indentWidth: 2,

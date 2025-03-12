@@ -1,14 +1,23 @@
 // deno-lint-ignore-file no-explicit-any
 import type { DiffResult } from './DiffResult.ts';
-import { loadLocalizationFileContents } from './loadLocalizationFromFile.ts';
+import { loadLocalizationFileContentsOrThrow } from './loadLocalizationFromFile.ts';
 import { stripImports } from './stripImports.ts';
 
+/**
+ A simplified type to substitute for the `LocalizedUnit` provided by [`@axhxrx/internationalization`](https://jsr.io/@axhxrx/internationalization). Since there is no way for us to know the `Locales` generic type actually used, we just use our own similarly-shaped (but less-specific) type.
+ */
 type LocaleRecord = Record<string, string>;
 
+/**
+ A recursive type to represent nested objects, similar to [`Localization`](https://jsr.io/@axhxrx/internationalization/0.0.8/Localization.ts).
+ */
 type NestedObject = {
   [key: string]: NestedObject | LocaleRecord;
 };
 
+/**
+ A cheap heuristic to fuzzy-check if `obj` appears to be a `LocaleRecord`.
+ */
 function isLocaleRecord(obj: any): obj is LocaleRecord
 {
   return (
@@ -18,6 +27,9 @@ function isLocaleRecord(obj: any): obj is LocaleRecord
   );
 }
 
+/**
+ Primitive object diff method.
+ */
 function diffObjects(
   obj1: NestedObject,
   obj2: NestedObject,
@@ -110,18 +122,14 @@ function diffObjects(
 /**
  Return a `Differences` object (array of difference descriptors) which indicates which values of jsonObj that are different in tsSourceFile.
 
- @param jsonObj — a p
- @param tsSourceFile
- @returns
+ @param jsonObj — a JSON object, which should be the result of exporting a TypeScript-format localization to JSON using this library — if it is not, then this method will throw an error
+ @param tsSourceFile — the source code of a TypeScript-format localization file, which should be the one used to produce the original JSON upon which `jsonObj` is based (although the two files may have diverged)
  */
 export const getDifferencesOrThrow = async (
   jsonObj: any,
   tsSourceCode: string,
 ): Promise<DiffResult> =>
 {
-  console.log('jsonObj!!!', typeof jsonObj, jsonObj);
-  console.log('tsSourceCode!!!', typeof tsSourceCode, tsSourceCode);
-
   function compare(obj1: any, obj2: any, path: string)
   {
     if (obj1 === obj2)
@@ -133,9 +141,9 @@ export const getDifferencesOrThrow = async (
 
     if (typeof obj1 !== typeof obj2)
     {
-      console.log('obj1:', typeof obj1, obj1);
-      console.log('obj2:', typeof obj2, obj2);
-      console.log('path:', path);
+      console.error('getDifferencesOrThrow(): obj1:', typeof obj1, obj1);
+      console.error('getDifferencesOrThrow(): obj2:', typeof obj2, obj2);
+      console.error('getDifferencesOrThrow(): path:', path);
       throw new Error(`getDifferencesOrThrow(): Error: Invalid input: Type mismatch at ${path}`);
     }
 
@@ -153,10 +161,7 @@ export const getDifferencesOrThrow = async (
   const tsSourceCodeWithImportsStripped = await stripImports(tsSourceCode);
 
   const obj1 = jsonObj;
-  const obj2 = (await loadLocalizationFileContents(tsSourceCodeWithImportsStripped)).module;
-
-  // console.log('obj1:', obj1);
-  // console.log('obj2:', obj2);
+  const obj2 = (await loadLocalizationFileContentsOrThrow(tsSourceCodeWithImportsStripped)).module;
 
   const result = compare(obj2, obj1, '');
 

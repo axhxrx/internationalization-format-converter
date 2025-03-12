@@ -1,3 +1,6 @@
 {
-  "extends": "https://jsr.io/@axhxrx/dprint-config/0.0.5/dprint.jsonc"
+  "extends": "https://jsr.io/@axhxrx/dprint-config/0.0.5/dprint.jsonc",
+  "typescript": {
+    "importDeclaration.preferSingleLine": false,
+  }
 }

@@ -89,7 +89,7 @@ export async function tryImportingCode(options: ImportOptions): Promise<ImportRe
       }
       catch
       {
-        // Ignore cleanup errors
+        // Ignore cleanup errors; nothing we can do about an error here...
       }
     }
   }

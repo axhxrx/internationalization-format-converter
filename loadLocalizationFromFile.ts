@@ -7,11 +7,11 @@ import { tryImportingCode } from './tryImportingCode.ts';
 type WhoKnows = Record<string, any>;
 
 /**
- Dynamically imports the TypeScript code from the specified `sourceCode` (which should be the text content of a `Localization` as would be read from a `.ts` file), and throws an error if it is not valid, otherwise returns the i18n definition. Here "valid" means not only valid TypeScript, but valid from the perspective of the rules for `Localization`.
+ Dynamically imports the TypeScript code from the specified `sourceCode` (which should be the text content of a `Localization` as would be read from a `.ts` file), and throws an error if it is not valid, otherwise returns the i18n definition. Here "valid" means not only valid TypeScript, but valid from the perspective of the rules for `Localization` (as defined by []`@axhxrx/internationalization`](https://jsr.io/@axhxrx/internationalization))
 
- You can therefore assume that if this method does not throw, the result can be serialized to JSON with `JSON.stringify()`, and it appears to be a valid `Localization` object as defined by `@axhxrx/internationalization` (even though we can't know the `Locales` generic type parameter here, so its a loose check).
+ You can therefore assume that if this method does not throw, the result can be serialized to JSON with `JSON.stringify()`, and it appears to be a valid `Localization` object (even though we can't know the `Locales` generic type parameter here, so its a loose check).
 
- This function has the side effect of writing the code to a temporary file, which is then deleted.
+ Note: This function has the side effect of writing the code to a temporary file, which is then deleted.
 
  @param sourceCode The TypeScript code to import — will be written to a temp file an imported.
 
@@ -19,14 +19,14 @@ type WhoKnows = Record<string, any>;
 
  FIXME: This should really use a result type instead of throwing, for consistency with `tryImportingCode()` and just general convenience.
  */
-export const loadLocalizationFileContents = async (
+export const loadLocalizationFileContentsOrThrow = async (
   sourceCode: string,
   rootLevelIdentifier?: string,
 ) =>
 {
   const tmpFile = await Deno.makeTempFile({ suffix: '.ts' });
   await Deno.writeTextFile(tmpFile, sourceCode);
-  const result = await loadLocalizationFromFile(tmpFile, rootLevelIdentifier);
+  const result = await loadLocalizationFromFileOrThrow(tmpFile, rootLevelIdentifier);
   await Deno.remove(tmpFile);
   return result;
 };
@@ -48,7 +48,7 @@ export const loadLocalizationFileContents = async (
 
  @throws {Error} If the TypeScript code is not valid or the format is incorrect.
  */
-export const loadLocalizationFromFile = async (
+export const loadLocalizationFromFileOrThrow = async (
   path: string,
   rootLevelIdentifier?: string | { derive: true },
 ): Promise<{ module: WhoKnows; originalCode: string; code: string; json: string }> =>
@@ -79,7 +79,7 @@ export const loadLocalizationFromFile = async (
   if (!reimportResult.success)
   {
     console.error(
-      `Failed to generate valid code when processing ${path}: the generated code is invalid in file: ${strippedTmpFile}: ${reimportResult}`,
+      `loadLocalizationFromFile():Failed to generate valid code when processing ${path}: the generated code is invalid in file: ${strippedTmpFile}: ${reimportResult}`,
     );
     throw new Error(`Failed to reimport file ${strippedTmpFile}: ${reimportResult.error?.message ?? 'unknown error'}`);
   }
@@ -87,7 +87,7 @@ export const loadLocalizationFromFile = async (
   if (!isLocalization(reimportResult.module))
   {
     throw new Error(
-      `Failed to reimport file ${strippedTmpFile}: the imported code is not a valid Localization module`,
+      `loadLocalizationFromFile(): Failed to reimport file ${strippedTmpFile}: the imported code is not a valid Localization module`,
     );
   }
   const bareModule: Localization<string> = reimportResult.module as Localization<string>;
@@ -120,7 +120,3 @@ export const loadLocalizationFromFile = async (
   }
   return { module, originalCode, code, json };
 };
-
-// const inputFile = './test/fixtures/' + 'hoge.nested.i18n.ts';
-// const uno = await loadLocalizationFromFile(inputFile, { derive: true });
-// console.log(Deno.inspect(uno, { depth: Infinity, colors: true }));

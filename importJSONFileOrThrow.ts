@@ -2,7 +2,7 @@ import { applyDifferencesUsingASTOrThrow } from './applyDifferencesUsingASTOrThr
 import { getDifferencesOrThrow } from './getDifferencesOrThrow.ts';
 
 /**
- Loads JSON and applies any differences to the corresponding TypeScript *.i18n.ts file.
+ Loads JSON and applies any differences to the corresponding TypeScript *.i18n.ts file. The assumption here is that the JSON object is newer than the TypeScript file, and differences should be applied to the TypeScript file.
 
  @throws {Error} If the content is not valid or the format is incorrect.
  */
@@ -15,19 +15,8 @@ export const importJSONFileOrThrow = async (jsonPath: string, tsPath: string) =>
 
 export const importJSONOrThrow = async (jsonText: string, tsCode: string) =>
 {
-  // console.log('importJSONFileOrThrow', json);
-
-  const j = JSON.parse(jsonText);
-
-  console.log('j!!!', typeof j, j);
-
-  const differences = await getDifferencesOrThrow(j, tsCode);
-
-  console.log('differences!!!', typeof differences, differences);
-
-  // console.log('tsCode', tsCode);
-  // console.log('differences', differences);
-
+  const jsonObj = JSON.parse(jsonText);
+  const differences = await getDifferencesOrThrow(jsonObj, tsCode);
   const updatedCode = applyDifferencesUsingASTOrThrow(differences, tsCode);
   return updatedCode;
 };

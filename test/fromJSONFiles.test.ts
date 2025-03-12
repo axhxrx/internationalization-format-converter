@@ -1,7 +1,7 @@
 import { join } from '@std/path';
 import { assert, assertEquals } from 'jsr:@std/assert';
 import { importJSONOrThrow } from '../importJSONFileOrThrow.ts';
-import { loadLocalizationFromFile } from '../loadLocalizationFromFile.ts';
+import { loadLocalizationFromFileOrThrow } from '../loadLocalizationFromFile.ts';
 
 const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;
 
@@ -33,10 +33,10 @@ Deno.test('conversion from a set of JSON files with changes', async () =>
   await Deno.copyFile(hogeInputFile, join(tmpDir, 'hoge.nested.i18n.ts'));
 
   // Load each of the localizations and assert whatever we can
-  const foo = await loadLocalizationFromFile(join(tmpDir, 'foo.i18n.ts'), { derive: true });
-  const bar = await loadLocalizationFromFile(join(tmpDir, 'bar.i18n.ts'), { derive: true });
-  const baz = await loadLocalizationFromFile(join(tmpDir, 'baz.i18n.ts'), { derive: true });
-  const hoge = await loadLocalizationFromFile(join(tmpDir, 'hoge.nested.i18n.ts'), { derive: true });
+  const foo = await loadLocalizationFromFileOrThrow(join(tmpDir, 'foo.i18n.ts'), { derive: true });
+  const bar = await loadLocalizationFromFileOrThrow(join(tmpDir, 'bar.i18n.ts'), { derive: true });
+  const baz = await loadLocalizationFromFileOrThrow(join(tmpDir, 'baz.i18n.ts'), { derive: true });
+  const hoge = await loadLocalizationFromFileOrThrow(join(tmpDir, 'hoge.nested.i18n.ts'), { derive: true });
 
   // Combine them into one object — for now, just do it like this; we will have a Conversion object later that tracks progress, etc.
   const all = {
