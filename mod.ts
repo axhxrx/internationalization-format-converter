@@ -9,3 +9,4 @@ if (import.meta.main)
 export { importJSONFileOrThrow, importJSONOrThrow } from './importJSONFileOrThrow.ts';
 export { loadLocalizationFileContentsOrThrow as loadLocalizationFileContents,
   loadLocalizationFromFileOrThrow as loadLocalizationFromFile } from './loadLocalizationFromFile.ts';
+export { exportToJSON, exportToJSONFile, importFromJSON, importFromJSONFile } from './main.ts';

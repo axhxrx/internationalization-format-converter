@@ -10,13 +10,15 @@ export const importJSONFileOrThrow = async (jsonPath: string, tsPath: string) =>
 {
   const json = await Deno.readTextFile(jsonPath);
   const ts = await Deno.readTextFile(tsPath);
-  return importJSONOrThrow(json, ts);
+  const debugInfo = { jsonPath, tsPath };
+  return importJSONOrThrow(json, ts, debugInfo);
 };
 
-export const importJSONOrThrow = async (jsonText: string, tsCode: string) =>
+export const importJSONOrThrow = async (jsonText: string, tsCode: string, debugInfo: Record<string, string> = {}) =>
 {
   const jsonObj = JSON.parse(jsonText);
-  const differences = await getDifferencesOrThrow(jsonObj, tsCode);
-  const updatedCode = applyDifferencesUsingASTOrThrow(differences, tsCode);
-  return updatedCode;
+  const differences = await getDifferencesOrThrow(jsonObj, tsCode, true);
+  const result = applyDifferencesUsingASTOrThrow(differences, tsCode, debugInfo);
+  console.log('importJSONOrThrow():', result);
+  return result;
 };

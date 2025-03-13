@@ -12,3 +12,5 @@ export interface DiffResult
     right?: string;
   };
 }
+
+// export type DiffResultWith

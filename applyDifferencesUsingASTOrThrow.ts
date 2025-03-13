@@ -11,6 +11,7 @@ import {
   QuoteKind,
   SyntaxKind,
 } from '@ts-morph/ts-morph';
+import console from 'node:console';
 import type { DiffResult } from './DiffResult.ts';
 
 function getExportedVariableNamesAndValues(
@@ -39,6 +40,136 @@ function getExportedVariableNamesAndValues(
   return results;
 }
 
+// Function to unwrap AsExpressions and TypeAssertions
+function unwrapExpression(expr: Expression): Expression
+{
+  while (
+    expr
+    && (expr.getKind() === SyntaxKind.AsExpression || expr.getKind() === SyntaxKind.TypeAssertionExpression)
+  )
+  {
+    expr = (expr as any).getExpression();
+  }
+  return expr;
+}
+
+// Function to recursively find and modify a string literal at the given path
+function findAndModify(
+  objExpr: Expression,
+  path: string[],
+  newValue: string,
+  localDeclarations: Map<string, Expression>,
+): boolean
+{
+  if (path.length === 0)
+  {
+    return false;
+  }
+
+  // If not an ObjectLiteralExpression, check if it's an identifier referencing a local variable
+  if (objExpr.getKind() === SyntaxKind.Identifier)
+  {
+    const identifierName = objExpr.getText();
+    const localValue = localDeclarations.get(identifierName);
+
+    if (localValue)
+    {
+      // If the local variable exists, use its value instead
+      return findAndModify(localValue, path, newValue, localDeclarations);
+    }
+    else
+    {
+      throw new Error(`Referenced identifier '${identifierName}' not found as local variable`);
+    }
+  }
+
+  // If not a direct object literal, we can't proceed
+  if (objExpr.getKind() !== SyntaxKind.ObjectLiteralExpression)
+  {
+    throw new Error(
+      `Expected an object literal or reference to a local variable, got: ${SyntaxKind[objExpr.getKind()]}`,
+    );
+  }
+
+  // Replace the relevant part in findAndModify
+  const objectLiteral = objExpr as ObjectLiteralExpression;
+  const [currentKey, ...remainingPath] = path;
+  const property = objectLiteral.getProperty(currentKey);
+
+  if (!property)
+  {
+    throw new Error(`Path not found in code: ${currentKey}`);
+  }
+
+  // Get the kind of the property for debugging reference. But, need to use asKind() to access the properties in a type-aware
+  const kindName = property.getKindName();
+  console.log('kind', kindName);
+
+  const shorthandPropertyAssignment = property.asKind(SyntaxKind.ShorthandPropertyAssignment);
+
+  // Handle both PropertyAssignment and ShorthandPropertyAssignment
+  // if (property.getKind() === SyntaxKind.ShorthandPropertyAssignment)
+  if (shorthandPropertyAssignment)
+  {
+    // For shorthand properties like { fooI18n }, we need to look up the variable
+    const shorthandName = shorthandPropertyAssignment.getName();
+    const localValue = localDeclarations.get(shorthandName);
+
+    if (localValue)
+    {
+      // Continue with the remaining path using the resolved value
+      return findAndModify(localValue, remainingPath, newValue, localDeclarations);
+    }
+    else
+    {
+      throw new Error(`Referenced shorthand property '${shorthandName}' not found as local variable`);
+    }
+  }
+  else if (!property.asKind(SyntaxKind.PropertyAssignment))
+  {
+    throw new Error(`Unsupported property kind: ${SyntaxKind[property.getKind()]} at path: ${currentKey}`);
+  }
+
+  // Original code continues for PropertyAssignment case
+  const prop = property as any;
+  const initializer = prop.getInitializer && prop.getInitializer();
+
+  if (!initializer)
+  {
+    throw new Error(`Property '${currentKey}' has no initializer.`);
+  }
+
+  const unwrappedInitializer = unwrapExpression(initializer);
+
+  if (remainingPath.length === 0)
+  {
+    if (unwrappedInitializer && unwrappedInitializer.asKind(SyntaxKind.StringLiteral))
+    {
+      const stringLiteral = unwrappedInitializer as StringLiteral;
+      stringLiteral.setLiteralValue(newValue);
+      stringLiteral.formatText({ indentSize: 4 });
+      return true;
+    }
+    else
+    {
+      throw new Error(`Expected string literal at path ${currentKey}`);
+    }
+  }
+  else if (unwrappedInitializer && unwrappedInitializer.asKind(SyntaxKind.ObjectLiteralExpression))
+  {
+    return findAndModify(
+      unwrappedInitializer as ObjectLiteralExpression,
+      remainingPath,
+      newValue,
+      localDeclarations,
+    );
+  }
+  else
+  {
+    throw new Error(`Expected object at path ${currentKey}`);
+  }
+}
+
 /**
  Given a `DiffResult` and a string containing TypeScript code for an *.i18n.ts file, this function applies the differences to the code using the TypeScript AST. It returns the modified code as a string — suitable for using as the content of a *.i18n.ts file.
 
@@ -46,8 +177,16 @@ function getExportedVariableNamesAndValues(
 
  This function throws an error if the code is not valid or the format is incorrect or any other thing goes wrong.
  */
-export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string): string
+export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string, debugInfo: Record<string, string>): {
+  originalCode: string;
+  modifiedCode: string;
+  appliedKeypaths: string[];
+  diff: DiffResult;
+  debugInfo: Record<string, string>;
+}
 {
+  const originalCode = tsCode;
+
   const project = new Project({
     useInMemoryFileSystem: true,
     manipulationSettings: {
@@ -58,15 +197,30 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
     },
   });
 
+  console.warn(`DIFF: `, Deno.inspect(diff, { depth: 100, colors: true }));
+
+  const appliedKeypaths: string[] = [];
+
   // Create a source file in memory
-  const sourceFile = project.createSourceFile('temp.ts', tsCode);
+  const sourceFile = project.createSourceFile('temp.ts', originalCode);
+
+  const localDeclarations = new Map<string, Expression>();
+  sourceFile.getVariableDeclarations().forEach(decl =>
+  {
+    const name = decl.getName();
+    const initializer = decl.getInitializer();
+    if (initializer)
+    {
+      localDeclarations.set(name, unwrapExpression(initializer));
+    }
+  });
 
   // Find the exported constants
   const exportedConsts = sourceFile.getVariableStatements().filter(stmt => stmt.isExported());
 
   const exportedNamesAndValues = getExportedVariableNamesAndValues(sourceFile);
 
-  console.log(exportedNamesAndValues);
+  console.log('EXPORTED NAMES:', exportedNamesAndValues.map(e => e.name));
 
   // HERE I NEED TO FIGURE OUT THE NAMES OF ALL EXPORTED VARIABLES
   // diff is like:
@@ -78,21 +232,27 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
   // exportedNamesAndValues is like:
   // [{name: 'foo', value: AsExpression}]
 
+  // 📖 OUTER LOOP: EXPORTED CONSTS
+  //
+  // We loop over the exported consts of the file, looking for a diff entry.
+  //
+  // This is not efficient, when you contemplate the diff being a huge diff generated by compating a combined JSON file for say, 500 files, with a single file (because we have the inner loops over every keyPath in the diff, below). However, we can fix that upstream of this method, because we can pare down the JSON to exclude unrelated translations. And it is actually desirable to be **able** to do the inefficient huge comparison of the "all translations vs one file", because that is useful for E2E tests of the entire system's integrity.
+
   for (const exportedConst of exportedConsts)
   {
-    console.log('exportedConst', exportedConst);
+    console.log('exportedConst', exportedConst.getText());
 
     const declarations = exportedConst.getDeclarations();
-    console.log('declarations', declarations);
+    console.log('declarations', declarations.map(d => d.getText()));
 
     const declaration = declarations[0];
-    console.log('declaration', declaration);
+    // console.log('declaration', declaration);
 
     const name = declaration.getName();
-    console.log('name', name);
+    console.log('dec[0] name', name);
 
     const initializer = declaration.getInitializer();
-    console.log('initializer', initializer);
+    console.log('initializer', initializer?.getKindName());
 
     if (!initializer)
     {
@@ -105,100 +265,116 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
     // Unwrap the exported constant initializer
     // exportedConstInitializer = unwrapExpression(exportedConstInitializer);
 
-    const objectLiteralExpression = unwrappedInitializer.asKind(SyntaxKind.ObjectLiteralExpression);
-    console.log('objectLiteralExpression', objectLiteralExpression);
+    // EXAMPLE:
+    // We have to support all these types
+    //
+    // const fooI18n = {
+    //   name: {
+    //     en: 'foo',
+    //     ja: 'フー',
+    //   },
+    // } as const;
 
-    if (!objectLiteralExpression)
+    // import { hoge } from './hoge.nested.i18n';
+
+    // const barI18n = {
+    //   name: {
+    //     en: 'bar',
+    //     ja: 'バー',
+    //   },
+    // } as const;
+
+    // export const i18n = fooI18n;
+
+    // export const nardwacker = { barI18n, fooI18n };
+
+    // export const derpola = {
+    //   fooI18n,
+    //   barI18n,
+    // };
+
+    // // Hi, mom!!
+    // export const hoge2 = { fooI18n, barI18n, hoge };
+    // export const hoge3 = hoge;
+
+    // Handle different initializer types
+    if (unwrappedInitializer.getKind() === SyntaxKind.ObjectLiteralExpression)
     {
-      throw new Error('Exported constant initializer is not an object literal.');
-    }
+      // Direct object literal case: { prop: value }
+      const objectLiteral = unwrappedInitializer as ObjectLiteralExpression;
 
-    const objectLiteral = objectLiteralExpression as ObjectLiteralExpression;
-    console.log('objectLiteral', objectLiteral);
-
-    for (const [keyPath, leftRight] of Object.entries(diff))
-    {
-      if (!keyPath.startsWith(name + '.'))
+      // Process the key paths for this object literal
+      for (const [keyPath, leftRight] of Object.entries(diff))
       {
-        continue;
-      }
-      const innerKeyPath = keyPath.slice(name.length + 1);
-      console.log('innerKeyPath', innerKeyPath);
-      console.log('leftRight', leftRight);
+        if (!keyPath.startsWith(name + '.'))
+        {
+          continue;
+        }
+        const innerKeyPath = keyPath.slice(name.length + 1);
+        console.log('keyPath', keyPath);
+        console.log('innerKeyPath', innerKeyPath);
+        console.log('leftRight', leftRight);
 
-      if (!leftRight.right)
-      {
-        throw new Error(`No right value found for key: ${keyPath}`);
-      }
-
-      findAndModify(objectLiteral, innerKeyPath.split('.'), leftRight.right);
-    }
-  }
-
-  // Function to unwrap AsExpressions and TypeAssertions
-  function unwrapExpression(expr: Expression): Expression
-  {
-    while (
-      expr
-      && (expr.getKind() === SyntaxKind.AsExpression || expr.getKind() === SyntaxKind.TypeAssertionExpression)
-    )
-    {
-      expr = (expr as any).getExpression();
-    }
-    return expr;
-  }
-
-  // Function to recursively find and modify a string literal at the given path
-  function findAndModify(
-    objExpr: ObjectLiteralExpression,
-    path: string[],
-    newValue: string,
-  ): void
-  {
-    if (path.length === 0) return;
-
-    const [currentKey, ...remainingPath] = path;
-    const property = objExpr.getProperty(currentKey);
-
-    if (!property || !property.asKind(SyntaxKind.PropertyAssignment))
-    {
-      throw new Error(`Path not found in code: ${currentKey}`);
-    }
-
-    const prop = property as any;
-    const initializer = prop.getInitializer && prop.getInitializer();
-
-    if (!initializer)
-    {
-      throw new Error(`Property '${currentKey}' has no initializer.`);
-    }
-
-    const unwrappedInitializer = unwrapExpression(initializer);
-
-    if (remainingPath.length === 0)
-    {
-      if (unwrappedInitializer && unwrappedInitializer.asKind(SyntaxKind.StringLiteral))
-      {
-        const stringLiteral = unwrappedInitializer as StringLiteral;
-        stringLiteral.setLiteralValue(newValue);
-        stringLiteral.formatText({ indentSize: 4 });
-      }
-      else
-      {
-        throw new Error(`Expected string literal at path ${currentKey}`);
+        if (!leftRight.right)
+        {
+          console.warn(`FIXME: No right value found for key: ${keyPath}`);
+          // throw new Error(`No right value found for key: ${keyPath}`);
+        }
+        else
+        {
+          const found = findAndModify(objectLiteral, innerKeyPath.split('.'), leftRight.right, localDeclarations);
+          if (found)
+          {
+            appliedKeypaths.push(keyPath);
+          }
+          else
+          {
+            console.log('SKIP keypath: ', keyPath);
+          }
+        }
       }
     }
-    else if (unwrappedInitializer && unwrappedInitializer.asKind(SyntaxKind.ObjectLiteralExpression))
+    else if (unwrappedInitializer.getKind() === SyntaxKind.Identifier)
     {
-      findAndModify(
-        unwrappedInitializer as ObjectLiteralExpression,
-        remainingPath,
-        newValue,
-      );
-    }
-    else
-    {
-      throw new Error(`Expected object at path ${currentKey}`);
+      // Reference case: export const i18n = fooI18n
+      const identifier = unwrappedInitializer.getText();
+      console.log(`Export '${name}' references identifier '${identifier}'`);
+
+      // Try to handle this case by looking for a matching local variable
+      // We'll pass the identifier directly to findAndModify which will look it up
+      for (const [keyPath, leftRight] of Object.entries(diff))
+      {
+        if (!keyPath.startsWith(name + '.'))
+        {
+          continue;
+        }
+        const innerKeyPath = keyPath.slice(name.length + 1);
+        console.log('innerKeyPath', innerKeyPath);
+        console.log('leftRight', leftRight);
+
+        if (!leftRight.right)
+        {
+          // throw new Error(`No right value found for key: ${keyPath}`);
+          console.warn(`FIXME: No right value found for key: ${keyPath}`);
+        }
+        else
+        {
+          const found = findAndModify(
+            unwrappedInitializer,
+            innerKeyPath.split('.'),
+            leftRight.right,
+            localDeclarations,
+          );
+          if (found)
+          {
+            appliedKeypaths.push(keyPath);
+          }
+          else
+          {
+            console.log('SKIP keypath: ', keyPath);
+          }
+        }
+      }
     }
   }
 
@@ -208,78 +384,7 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
   sourceFile.formatText();
 
   // Get the modified code
-  const newCode = sourceFile.getFullText();
+  const modifiedCode = sourceFile.getFullText();
 
-  return newCode;
+  return { originalCode, modifiedCode, appliedKeypaths, diff, debugInfo };
 }
-
-// Example usage:
-const diff: DiffResult = {
-  'favorite.drink.alcoholic.en': { left: 'wine', right: 'whiskey' },
-  'favorite.drink.alcoholic.ja': { left: 'ワイン', right: 'ウイスキー' },
-  'favorite.drink.nonAlcoholic.en': { left: 'milk', right: 'water' },
-  'favorite.drink.nonAlcoholic.ja': { left: '牛乳', right: '水' },
-};
-
-// const tsCode = `
-// import { something } from 'somewhere';
-
-// export const i18n = {
-//   favorite: {
-//     food: {
-//       en: 'pizza',
-//       ja: 'ピザ',
-//     },
-
-//     drink: {
-//       alcoholic: {
-//         en: 'wine',
-//         ja: 'ワイン',
-//       },
-//       nonAlcoholic: {
-//         en: 'milk',
-//         ja: '牛乳',
-//       },
-//     },
-//   },
-// } as const;
-
-// // Some comment
-
-// export const anotherConst = {
-//   value: 42,
-// };
-// `;
-
-// const newTsCode = applyDifferencesUsingASTOrThrow(diff, tsCode);
-// console.log(newTsCode);
-
-/**
-import { something } from 'somewhere';
-
-export const i18n = {
-  favorite: {
-    food: {
-      en: 'pizza',
-      ja: 'ピザ',
-    },
-
-    drink: {
-      alcoholic: {
-        en: 'whiskey',
-        ja: 'ウイスキー',
-      },
-      nonAlcoholic: {
-        en: 'water',
-        ja: '水',
-      },
-    },
-  },
-} as const;
-
-// Some comment
-
-export const anotherConst = {
-  value: 42,
-};
-*/

@@ -87,22 +87,23 @@ Deno.test('conversion from a set of JSON files with changes', async () =>
   await Deno.writeTextFile(jsonPath, JSON.stringify(all, null, 2));
 
   // Load the JSON back into memory, and then into TypeScript, to check that it works.
-  const allJSON = await importJSONOrThrow(JSON.stringify(all), await Deno.readTextFile(jsonPath));
+  const tsCode = await Deno.readTextFile(fooInputFile);
+  const fooTsUpdated = await importJSONOrThrow(JSON.stringify(all), tsCode);
 
-  const fooTs = await Deno.readTextFile(pathToFixtures + 'foo.i18n.ts');
-  const barTs = await Deno.readTextFile(pathToFixtures + 'bar.i18n.ts');
-  const bazTs = await Deno.readTextFile(pathToFixtures + 'baz.i18n.ts');
-  const hogeTs = await Deno.readTextFile(pathToFixtures + 'hoge.nested.i18n.ts');
+  // const fooTs = await Deno.readTextFile(pathToFixtures + 'foo.i18n.ts');
+  // const barTs = await Deno.readTextFile(pathToFixtures + 'bar.i18n.ts');
+  // const bazTs = await Deno.readTextFile(pathToFixtures + 'baz.i18n.ts');
+  // const hogeTs = await Deno.readTextFile(pathToFixtures + 'hoge.nested.i18n.ts');
 
-  const fooTsUpdated = await importJSONOrThrow(JSON.stringify(fooJSON), fooTs);
-  const barTsUpdated = await importJSONOrThrow(JSON.stringify(barJSON), barTs);
-  const bazTsUpdated = await importJSONOrThrow(JSON.stringify(bazJSON), bazTs);
-  const hogeTsUpdated = await importJSONOrThrow(JSON.stringify(hogeJSON), hogeTs);
+  // const fooTsUpdated = await importJSONOrThrow(JSON.stringify(fooJSON), fooTs);
+  // const barTsUpdated = await importJSONOrThrow(JSON.stringify(barJSON), barTs);
+  // const bazTsUpdated = await importJSONOrThrow(JSON.stringify(bazJSON), bazTs);
+  // const hogeTsUpdated = await importJSONOrThrow(JSON.stringify(hogeJSON), hogeTs);
 
-  console.log(fooTsUpdated);
-  console.log(barTsUpdated);
-  console.log(bazTsUpdated);
-  console.log(hogeTsUpdated);
+  // console.log(fooTsUpdated);
+  // console.log(barTsUpdated);
+  // console.log(bazTsUpdated);
+  // console.log(hogeTsUpdated);
 
   const expected = `export const foo = {
   name: {
@@ -121,7 +122,7 @@ Deno.test('conversion from a set of JSON files with changes', async () =>
   },
 } as const;
 `;
-  assertEquals(fooTsUpdated, expected);
+  assertEquals(fooTsUpdated.modifiedCode, expected);
 
   // console.log('WAHATA');
   // console.log(JSON.stringify(all, null, 2));
@@ -153,3 +154,5 @@ Deno.test('conversion from a set of JSON files with changes', async () =>
   // const expected = Deno.readTextFileSync(pathToFixtures + 'foo.i18n.json');
   // assertEquals(j, expected);
 });
+
+// FIXME THIS TEST IS FUBAR NEEDS REWRITE

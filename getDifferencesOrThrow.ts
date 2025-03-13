@@ -128,8 +128,11 @@ function diffObjects(
 export const getDifferencesOrThrow = async (
   jsonObj: any,
   tsSourceCode: string,
+  removePathKey = false,
 ): Promise<DiffResult> =>
 {
+  console.log('jsonObj', jsonObj);
+
   function compare(obj1: any, obj2: any, path: string)
   {
     if (obj1 === obj2)
@@ -160,10 +163,17 @@ export const getDifferencesOrThrow = async (
 
   const tsSourceCodeWithImportsStripped = await stripImports(tsSourceCode);
 
-  const obj1 = jsonObj;
-  const obj2 = (await loadLocalizationFileContentsOrThrow(tsSourceCodeWithImportsStripped)).module;
+  let objFromJSON = jsonObj;
+  const objFromTypeScript = (await loadLocalizationFileContentsOrThrow(tsSourceCodeWithImportsStripped)).module;
 
-  const result = compare(obj2, obj1, '');
+  if (removePathKey)
+  {
+    // Remove the top-level key, which is the path to the file, and log it
+    const pathKey = Object.keys(objFromJSON)[0];
+    objFromJSON = objFromJSON[pathKey];
+  }
+
+  const result = compare(objFromTypeScript, objFromJSON, '');
 
   return result;
 };
