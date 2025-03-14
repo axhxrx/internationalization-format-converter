@@ -6,6 +6,8 @@ if (import.meta.main)
 }
 
 // Export public API
+export { convertFromSimpleLocalizeFormat } from './convertFromSimpleLocalizeFormat.ts';
+export { convertToSimpleLocalizeFormat } from './convertToSimpleLocalizeFormat.ts';
 export { importJSONFileOrThrow, importJSONOrThrow } from './importJSONFileOrThrow.ts';
 export { loadLocalizationFileContentsOrThrow as loadLocalizationFileContents,
   loadLocalizationFromFileOrThrow as loadLocalizationFromFile } from './loadLocalizationFromFile.ts';
