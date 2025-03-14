@@ -123,12 +123,12 @@ function diffObjects(
  Return a `Differences` object (array of difference descriptors) which indicates which values of jsonObj that are different in tsSourceFile.
 
  @param jsonObj — a JSON object, which should be the result of exporting a TypeScript-format localization to JSON using this library — if it is not, then this method will throw an error
- @param tsSourceFile — the source code of a TypeScript-format localization file, which should be the one used to produce the original JSON upon which `jsonObj` is based (although the two files may have diverged)
+
+ @param tsSourceCode — the source code of a TypeScript-format localization file, which should be the one used to produce the original JSON upon which `jsonObj` is based (although the two files may have diverged)
  */
 export const getDifferencesOrThrow = async (
   jsonObj: any,
   tsSourceCode: string,
-  removePathKey = false,
 ): Promise<DiffResult> =>
 {
   console.log('jsonObj', jsonObj);
@@ -163,15 +163,8 @@ export const getDifferencesOrThrow = async (
 
   const tsSourceCodeWithImportsStripped = await stripImports(tsSourceCode);
 
-  let objFromJSON = jsonObj;
+  const objFromJSON = jsonObj;
   const objFromTypeScript = (await loadLocalizationFileContentsOrThrow(tsSourceCodeWithImportsStripped)).module;
-
-  if (removePathKey)
-  {
-    // Remove the top-level key, which is the path to the file, and log it
-    const pathKey = Object.keys(objFromJSON)[0];
-    objFromJSON = objFromJSON[pathKey];
-  }
 
   const result = compare(objFromTypeScript, objFromJSON, '');
 

@@ -88,7 +88,7 @@ Deno.test('conversion from a set of JSON files with changes', async () =>
 
   // Load the JSON back into memory, and then into TypeScript, to check that it works.
   const tsCode = await Deno.readTextFile(fooInputFile);
-  const fooTsUpdated = await importJSONOrThrow(JSON.stringify(all), tsCode);
+  const fooTsUpdated = await importJSONOrThrow(JSON.stringify(fooJSON), tsCode);
 
   // const fooTs = await Deno.readTextFile(pathToFixtures + 'foo.i18n.ts');
   // const barTs = await Deno.readTextFile(pathToFixtures + 'bar.i18n.ts');
