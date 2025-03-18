@@ -1,43 +1,21 @@
 // deno-lint-ignore-file no-explicit-any
+
+import { isLocalization, isLocalizedUnit, type Localization } from '@axhxrx/internationalization';
 import type { DiffResult } from './DiffResult.ts';
 import { loadLocalizationFileContentsOrThrow } from './loadLocalizationFromFile.ts';
 import { stripImports } from './stripImports.ts';
 
 /**
- A simplified type to substitute for the `LocalizedUnit` provided by [`@axhxrx/internationalization`](https://jsr.io/@axhxrx/internationalization). Since there is no way for us to know the `Locales` generic type actually used, we just use our own similarly-shaped (but less-specific) type.
- */
-type LocaleRecord = Record<string, string>;
-
-/**
- A recursive type to represent nested objects, similar to [`Localization`](https://jsr.io/@axhxrx/internationalization/0.0.8/Localization.ts).
- */
-type NestedObject = {
-  [key: string]: NestedObject | LocaleRecord;
-};
-
-/**
- A cheap heuristic to fuzzy-check if `obj` appears to be a `LocaleRecord`.
- */
-function isLocaleRecord(obj: any): obj is LocaleRecord
-{
-  return (
-    obj
-    && typeof obj === 'object'
-    && Object.values(obj).every(value => typeof value === 'string')
-  );
-}
-
-/**
  Primitive object diff method.
  */
 function diffObjects(
-  obj1: NestedObject,
-  obj2: NestedObject,
+  obj1: Localization<string>,
+  obj2: Localization<string>,
 ): DiffResult
 {
   const result: DiffResult = {};
 
-  function traverse(o1: any, o2: any, path: string[] = [])
+  function traverse(o1: Localization<string>, o2: Localization<string>, path: string[] = [])
   {
     const keys = new Set([
       ...Object.keys(o1 || {}),
@@ -50,9 +28,9 @@ function diffObjects(
       const val2 = o2 ? o2[key] : undefined;
       const currentPath = [...path, key];
 
-      if (isLocaleRecord(val1) && isLocaleRecord(val2))
+      if (isLocalizedUnit(val1) && isLocalizedUnit(val2))
       {
-        // Both are leaf nodes (LocaleRecord), compare each locale
+        // Both are leaf nodes (LocalizedUnit), compare each locale
         const locales = new Set([
           ...Object.keys(val1),
           ...Object.keys(val2),
@@ -71,7 +49,7 @@ function diffObjects(
           }
         }
       }
-      else if (isLocaleRecord(val1))
+      else if (isLocalizedUnit(val1))
       {
         // val1 is leaf, val2 is not, or undefined
         for (const locale of Object.keys(val1))
@@ -83,7 +61,7 @@ function diffObjects(
           };
         }
       }
-      else if (isLocaleRecord(val2))
+      else if (isLocalizedUnit(val2))
       {
         // val2 is leaf, val1 is not, or undefined
         for (const locale of Object.keys(val2))

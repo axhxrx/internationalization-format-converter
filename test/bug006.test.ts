@@ -4,21 +4,9 @@ import { convertFromSimpleLocalizeFormat } from '../convertFromSimpleLocalizeFor
 import { loadLocalizationFromFileOrThrow } from '../loadLocalizationFromFile.ts';
 import { exportToJSON, exportToJSONFile, importFromJSON, importFromJSONFile, importFromJSONPathMap } from '../main.ts';
 import { mergeAll } from '../merge.ts';
+import { assertTextFilesEqual } from './assertTextFilesEqual.ts';
 
 const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;
-
-export async function assertFilesEqual(path1: string, path2: string)
-{
-  const rp1 = await Deno.realPath(path1);
-  const rp2 = await Deno.realPath(path2);
-  const content1 = await Deno.readTextFile(rp1);
-  const content2 = await Deno.readTextFile(rp2);
-
-  if (content1 !== content2)
-  {
-    throw new Error(`Files are not equal: ${path1} and ${path2} (${rp1} and ${rp2})`);
-  }
-}
 
 Deno.test('Spitballing the batch export/import process', async () =>
 {
@@ -145,10 +133,10 @@ Deno.test('Spitballing the batch export/import process', async () =>
 
   console.log('Mods:', mods);
 
-  await assertFilesEqual(rootPath, join(pathToFixtures, 'insane-file-extensionless-import.modified.ts'));
-  await assertFilesEqual(hogePath, join(pathToFixtures, 'hoge.nested.i18n.modified.ts'));
-  await assertFilesEqual(fooPath, join(pathToFixtures, 'foo.i18n.modified.ts'));
-  await assertFilesEqual(barPath, join(pathToFixtures, 'bar.i18n.modified.ts'));
+  await assertTextFilesEqual(rootPath, join(pathToFixtures, 'insane-file-extensionless-import.modified.ts'));
+  await assertTextFilesEqual(hogePath, join(pathToFixtures, 'hoge.nested.i18n.modified.ts'));
+  await assertTextFilesEqual(fooPath, join(pathToFixtures, 'foo.i18n.modified.ts'));
+  await assertTextFilesEqual(barPath, join(pathToFixtures, 'bar.i18n.modified.ts'));
 
   // const modifiedFoo = await importFromJSONPathMap(mergedJSONObject, { dryRun: true });
   // const modifiedBar = await importFromJSONPathMap(mergedJSONObject, { dryRun: true });

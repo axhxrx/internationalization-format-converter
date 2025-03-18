@@ -39,7 +39,8 @@
       "args": [
         //"test/bug005.test.ts"
         // "test/fromJSONFiles.test.ts"
-        "test/bug006.test.ts"
+        // "test/bug006.test.ts"
+        "test/BatchImport.test.ts"
       ],
       "attachSimplePort": 9229
     },

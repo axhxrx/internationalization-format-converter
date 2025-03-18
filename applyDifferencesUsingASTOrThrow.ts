@@ -2,45 +2,18 @@ import type {
   Expression,
   ObjectLiteralExpression,
   StringLiteral,
-  VariableStatement,
 } from '@ts-morph/ts-morph';
 import {
-  IndentationText,
-  NewLineKind,
-  Project,
-  QuoteKind,
   SyntaxKind,
 } from '@ts-morph/ts-morph';
-import console from 'node:console';
+
+import { createTsProject } from './createTsProject.ts';
 import type { DiffResult } from './DiffResult.ts';
+import { getExportedVariableNamesAndValues } from './getExportedVariableNamesAndValues.ts';
 
-function getExportedVariableNamesAndValues(
-  sourceFile: ReturnType<Project['createSourceFile']>,
-): Array<{ name: string; value: Expression | undefined }>
-{
-  // Find all exported VariableStatements
-  const exportedVars = sourceFile
-    .getVariableStatements()
-    .filter(stmt => stmt.isExported());
-
-  // Collect each variable's name and initializer
-  const results: Array<{ name: string; value: Expression | undefined }> = [];
-
-  exportedVars.forEach((stmt: VariableStatement) =>
-  {
-    stmt.getDeclarations().forEach((decl) =>
-    {
-      results.push({
-        name: decl.getName(),
-        value: decl.getInitializer(), // could be undefined if no initializer
-      });
-    });
-  });
-
-  return results;
-}
-
-// Function to unwrap AsExpressions and TypeAssertions
+/**
+ Local function to unwrap AsExpressions and TypeAssertions
+ */
 function unwrapExpression(expr: Expression): Expression
 {
   while (
@@ -53,7 +26,9 @@ function unwrapExpression(expr: Expression): Expression
   return expr;
 }
 
-// Function to recursively find and modify a string literal at the given path
+/**
+Local function to recursively find and modify a string literal at the given path
+ */
 function findAndModify(
   objExpr: Expression,
   path: string[],
@@ -187,22 +162,11 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
 {
   const originalCode = tsCode;
 
-  const project = new Project({
-    useInMemoryFileSystem: true,
-    manipulationSettings: {
-      indentationText: IndentationText.TwoSpaces, // Adjust to match your code's indentation
-      quoteKind: QuoteKind.Single, // Use single quotes
-      newLineKind: NewLineKind.LineFeed, // Use '\n' for new lines
-      insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces: true,
-    },
-  });
+  const { sourceFile } = createTsProject(tsCode);
 
   console.warn(`DIFF: `, Deno.inspect(diff, { depth: 100, colors: true }));
 
   const appliedKeypaths: string[] = [];
-
-  // Create a source file in memory
-  const sourceFile = project.createSourceFile('temp.ts', originalCode);
 
   const localDeclarations = new Map<string, Expression>();
   sourceFile.getVariableDeclarations().forEach(decl =>
@@ -378,9 +342,7 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
     }
   }
 
-  console.log('R WE DONE?');
-
-  // Format the entire source file to adjust indentation and formatting
+  // Format the entire source file to adjust indentation and formatting, to avoid spurious differences
   sourceFile.formatText();
 
   // Get the modified code
