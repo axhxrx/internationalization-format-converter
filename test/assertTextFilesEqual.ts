@@ -1,3 +1,5 @@
+import { assertEquals } from '@std/assert';
+
 export async function assertTextFilesEqual(path1: string, path2: string)
 {
   const rp1 = await Deno.realPath(path1);
@@ -7,6 +9,7 @@ export async function assertTextFilesEqual(path1: string, path2: string)
 
   if (content1 !== content2)
   {
-    throw new Error(`Files are not equal: ${path1} and ${path2} (${rp1} and ${rp2})`);
+    // throw new Error(`Files are not equal: ${path1} and ${path2} (${rp1} and ${rp2})`);
+    assertEquals(content1, content2, `Files are not equal: ${path1} and ${path2} (${rp1} and ${rp2})`);
   }
 }

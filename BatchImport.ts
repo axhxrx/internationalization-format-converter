@@ -1,11 +1,9 @@
-import { walk } from '@std/fs';
-import { isAbsolute, join, normalize, parse } from '@std/path';
-import { stringify } from 'node:querystring';
+import { isAbsolute, join } from '@std/path';
 import { isLocalization } from '../internationalization/mod.ts';
+import { convertFromSimpleLocalizeFormat } from './convertFromSimpleLocalizeFormat.ts';
 import { DiffResult } from './DiffResult.ts';
 import { importJSONOrThrow } from './importJSONFileOrThrow.ts';
 import { loadLocalizationFromFileOrThrow } from './loadLocalizationFromFile.ts';
-import { exportToJSONFile } from './main.ts';
 import type { SearchOptions } from './SearchOptions.ts';
 
 const defaultSearchOptions: SearchOptions = {
@@ -25,9 +23,17 @@ interface FailedBatchImport extends BatchImport
   error: unknown;
 }
 
-interface ImportOptions
+export interface ImportOptions
 {
+  /**
+   If true, the input JSON pathMap is converted from SimpleLocalize format to our normal JSON format before attempting the import.
+   */
   simpleLocalizeFormat?: boolean;
+
+  /**
+   The rootPath (default: current working directory) controls how relative paths in the JSON `pathMap` that is passed to the constructor are resolved. It is expected that paths in the JSON `pathMap` will often be relative paths. (If the paths are NOT relative, though, this option has no effect.)
+   */
+  rootPath?: string;
 }
 
 export class ImportResult
@@ -54,21 +60,39 @@ export class BatchImport
 
   private inputs: Record<string, ImportResult>;
 
+  readonly jsonPathMap: Record<string, unknown>;
+
   constructor(
     /**
      A JSON object whose keys are paths to the TypeScript source files to be modified, and the values are the JSON objects to be imported. The JSON objects are presumed to be the result of a previous export operation, and may or may not contain changes that need to be mapped to the TypeScript source files.
      */
-    protected jsonPathMap: Record<string, unknown>,
+    jsonPathMap: Record<string, unknown>,
     protected importOptions: ImportOptions = {},
   )
   {
     this.inputs = {};
+
+    if (importOptions.simpleLocalizeFormat)
+    {
+      const fixedPathMap: Record<string, Record<string, unknown>> = {};
+      for (const [key, value] of Object.entries(jsonPathMap))
+      {
+        fixedPathMap[key] = convertFromSimpleLocalizeFormat(value as Record<string, unknown>);
+      }
+      this.jsonPathMap = fixedPathMap;
+    }
+    else
+    {
+      this.jsonPathMap = jsonPathMap;
+    }
   }
 
   /**
    Run the batch import operation. The `rootPath` argument controls how relative paths in the JSON `pathMap` that is passed to the constructor are resolved (defaults to the current working directory).
    */
-  async run(rootPath?: string): Promise<CompletedBatchImport | FailedBatchImport>
+  async run(
+    rootPath?: string,
+  ): Promise<CompletedBatchImport | FailedBatchImport>
   {
     const paths = Object.keys(this.jsonPathMap);
     for (const possiblyRelativePath of paths)

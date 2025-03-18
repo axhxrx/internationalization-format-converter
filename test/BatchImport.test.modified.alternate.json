@@ -1,7 +1,7 @@
 {
   "test/fixtures/foo.i18n.ts": {
     "en": {
-      "FOO": {
+      "foo": {
         "name": "Fred",
         "greeting": {
           "friendly": "Hello, {name}!",
@@ -10,7 +10,7 @@
       }
     },
     "ja": {
-      "FOO": {
+      "foo": {
         "name": "フレッド",
         "greeting": {
           "friendly": "こんにちは、{name}さん！",
