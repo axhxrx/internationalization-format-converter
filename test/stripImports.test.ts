@@ -1,7 +1,7 @@
 import { assert, assertEquals } from 'jsr:@std/assert';
 
-import { stripImports } from '../stripImports.ts';
-import { tryImportingCode } from '../tryImportingCode.ts';
+import { stripImports } from '../src/ast/stripImports.ts';
+import { tryImportingCode } from '../src/ast/tryImportingCode.ts';
 
 const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;
 

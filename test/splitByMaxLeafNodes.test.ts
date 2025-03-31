@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from 'jsr:@std/assert';
-import { splitByMaxLeafNodesOrThrow } from '../splitByMaxLeafNodes.ts';
+import { splitByMaxLeafNodesOrThrow } from '../src/util/splitByMaxLeafNodes.ts';
 
 Deno.test('splitByMaxLeafNodesOrThrow with simple object under limit', () =>
 {

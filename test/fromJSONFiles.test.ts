@@ -1,7 +1,7 @@
 import { join } from '@std/path';
 import { assert, assertEquals } from 'jsr:@std/assert';
-import { importJSONOrThrow } from '../importJSONOrThrow.ts';
-import { loadLocalizationFromFileOrThrow } from '../loadLocalizationFromFile.ts';
+import { importJSONOrThrow } from '../src/convert/importJSONOrThrow.ts';
+import { loadLocalizationFromFileOrThrow } from '../src/ast/loadLocalizationFromFile.ts';
 
 const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;
 

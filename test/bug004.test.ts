@@ -2,7 +2,7 @@ import { join } from '@std/path';
 
 import { assert } from 'jsr:@std/assert';
 
-import { loadLocalizationFromFileOrThrow } from '../loadLocalizationFromFile.ts';
+import { loadLocalizationFromFileOrThrow } from '../src/ast/loadLocalizationFromFile.ts';
 
 const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;
 

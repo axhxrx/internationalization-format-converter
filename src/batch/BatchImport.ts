@@ -1,10 +1,10 @@
 import { isAbsolute, join } from '@std/path';
-import { isLocalization } from '../internationalization/mod.ts';
-import { convertFromSimpleLocalizeFormat } from './convertFromSimpleLocalizeFormat.ts';
-import { DiffResult } from './DiffResult.ts';
-import { importJSONOrThrow } from './importJSONOrThrow.ts';
-import { loadLocalizationFromFileOrThrow } from './loadLocalizationFromFile.ts';
-import type { SearchOptions } from './SearchOptions.ts';
+import { isLocalization } from '@axhxrx/internationalization';
+import { convertFromSimpleLocalizeFormat } from '../convert/convertFromSimpleLocalizeFormat.ts';
+import { DiffResult } from '../ast/DiffResult.ts';
+import { importJSONOrThrow } from '../convert/importJSONOrThrow.ts';
+import { loadLocalizationFromFileOrThrow } from '../ast/loadLocalizationFromFile.ts';
+import type { SearchOptions } from '../cli/SearchOptions.ts';
 
 const defaultSearchOptions: SearchOptions = {
   fileExtensions: ['.json'],

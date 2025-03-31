@@ -1,9 +1,9 @@
 import { parseArgs } from '@std/cli';
-import { batchExportWithOptions } from './batchExportWithOptions.ts';
-import { batchImportWithOptions } from './batchImportWithOptions.ts';
-import { exportToJSONFile } from './exportToJSONFile.ts';
-import { importFromJSONFile } from './importFromJSONFile.ts';
-import { logger } from './Logger.ts';
+import { batchExportWithOptions } from '../batch/batchExportWithOptions.ts';
+import { batchImportWithOptions } from '../batch/batchImportWithOptions.ts';
+import { exportToJSONFile } from '../convert/exportToJSONFile.ts';
+import { importFromJSONFile } from '../convert/importFromJSONFile.ts';
+import { logger } from '../util/Logger.ts';
 import { printHelp } from './printHelp.ts';
 
 /**

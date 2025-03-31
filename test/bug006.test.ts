@@ -1,10 +1,10 @@
 import { join } from '@std/path';
 
-import { convertFromSimpleLocalizeFormat } from '../convertFromSimpleLocalizeFormat.ts';
-import { exportToJSON } from '../exportToJSON.ts';
-import { exportToJSONFile } from '../exportToJSONFile.ts';
-import { importFromJSONPathMap } from '../importFromJSONPathMap.ts';
-import { mergeAll } from '../merge.ts';
+import { convertFromSimpleLocalizeFormat } from '../src/convert/convertFromSimpleLocalizeFormat.ts';
+import { exportToJSON } from '../src/convert/exportToJSON.ts';
+import { exportToJSONFile } from '../src/convert/exportToJSONFile.ts';
+import { importFromJSONPathMap } from '../src/convert/importFromJSONPathMap.ts';
+import { mergeAll } from '../src/util/merge.ts';
 import { assertTextFilesEqual } from './assertTextFilesEqual.ts';
 
 const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;

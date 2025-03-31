@@ -1,9 +1,9 @@
 import { walk } from '@std/fs';
 import { join, normalize, parse, relative } from '@std/path';
-import { exportToJSONFile } from './exportToJSONFile.ts';
-import type { SearchOptions } from './SearchOptions.ts';
+import { exportToJSONFile } from '../convert/exportToJSONFile.ts';
+import type { SearchOptions } from '../cli/SearchOptions.ts';
 
-import { logger } from './Logger.ts';
+import { logger } from '../util/Logger.ts';
 
 class ExportResult
 {

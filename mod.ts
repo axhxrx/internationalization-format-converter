@@ -1,5 +1,4 @@
-import { exportToJSON } from './exportToJSON.ts';
-import { main } from './main.ts';
+import { main } from './src/cli/main.ts';
 
 if (import.meta.main)
 {
@@ -7,16 +6,16 @@ if (import.meta.main)
 }
 
 // Export public API
-export { convertFromSimpleLocalizeFormat } from './convertFromSimpleLocalizeFormat.ts';
-export { convertToSimpleLocalizeFormat } from './convertToSimpleLocalizeFormat.ts';
+export { convertFromSimpleLocalizeFormat } from './src/convert/convertFromSimpleLocalizeFormat.ts';
+export { convertToSimpleLocalizeFormat } from './src/convert/convertToSimpleLocalizeFormat.ts';
 
 export { loadLocalizationFileContentsOrThrow as loadLocalizationFileContents,
-  loadLocalizationFromFileOrThrow as loadLocalizationFromFile } from './loadLocalizationFromFile.ts';
+  loadLocalizationFromFileOrThrow as loadLocalizationFromFile } from './src/ast/loadLocalizationFromFile.ts';
 
-export { importJSONFileOrThrow } from './importJSONFileOrThrow.ts';
-export { importJSONOrThrow } from './importJSONOrThrow.ts';
+export { importJSONFileOrThrow } from './src/convert/importJSONFileOrThrow.ts';
+export { importJSONOrThrow } from './src/convert/importJSONOrThrow.ts';
 
-export { exportToJSON } from './exportToJSON.ts';
-export { exportToJSONFile } from './exportToJSONFile.ts';
-export { importFromJSON } from './importFromJSON.ts';
-export { importFromJSONFile } from './importFromJSONFile.ts';
+export { exportToJSON } from './src/convert/exportToJSON.ts';
+export { exportToJSONFile } from './src/convert/exportToJSONFile.ts';
+export { importFromJSON } from './src/convert/importFromJSON.ts';
+export { importFromJSONFile } from './src/convert/importFromJSONFile.ts';

@@ -10,7 +10,7 @@ import {
 import { createTsProject } from './createTsProject.ts';
 import type { DiffResult } from './DiffResult.ts';
 import { getExportedVariableNamesAndValues } from './getExportedVariableNamesAndValues.ts';
-import { logger } from './Logger.ts';
+import { logger } from '../util/Logger.ts';
 
 /**
  Local function to unwrap AsExpressions and TypeAssertions

@@ -2,8 +2,8 @@ import { join } from '@std/path';
 
 import { assert, assertGreater } from 'jsr:@std/assert';
 
-import { loadLocalizationFromFileOrThrow } from '../loadLocalizationFromFile.ts';
-import { stripImports } from '../stripImports.ts';
+import { loadLocalizationFromFileOrThrow } from '../src/ast/loadLocalizationFromFile.ts';
+import { stripImports } from '../src/ast/stripImports.ts';
 
 const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;
 

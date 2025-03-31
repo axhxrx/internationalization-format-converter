@@ -1,5 +1,5 @@
-import { applyDifferencesUsingASTOrThrow } from './applyDifferencesUsingASTOrThrow.ts';
-import { getDifferencesOrThrow } from './getDifferencesOrThrow.ts';
+import { applyDifferencesUsingASTOrThrow } from '../ast/applyDifferencesUsingASTOrThrow.ts';
+import { getDifferencesOrThrow } from '../ast/getDifferencesOrThrow.ts';
 
 export const importJSONOrThrow = async (jsonText: string, tsCode: string, debugInfo: Record<string, string> = {}) =>
 {

@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert';
-import { createTsProject } from '../createTsProject.ts';
-import { getExportedVariableNamesAndValues } from '../getExportedVariableNamesAndValues.ts';
+import { createTsProject } from '../src/ast/createTsProject.ts';
+import { getExportedVariableNamesAndValues } from '../src/ast/getExportedVariableNamesAndValues.ts';
 
 Deno.test('getExportedVariableNamesAndValues', () =>
 {

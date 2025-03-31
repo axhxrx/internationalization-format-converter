@@ -1,5 +1,5 @@
 import { assertEquals } from 'jsr:@std/assert';
-import { countLeafNodes } from '../countLeafNodes.ts';
+import { countLeafNodes } from '../src/util/countLeafNodes.ts';
 
 Deno.test('countLeafNodes with empty object', () =>
 {

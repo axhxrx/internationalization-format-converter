@@ -1,4 +1,4 @@
-import { loadLocalizationFromFileOrThrow } from './loadLocalizationFromFile.ts';
+import { loadLocalizationFromFileOrThrow } from '../ast/loadLocalizationFromFile.ts';
 import { convertToSimpleLocalizeFormat } from './convertToSimpleLocalizeFormat.ts';
 
 /**

@@ -1,5 +1,5 @@
 import { convertFromSimpleLocalizeFormat } from './convertFromSimpleLocalizeFormat.ts';
-import { getDifferencesOrThrow } from './getDifferencesOrThrow.ts';
+import { getDifferencesOrThrow } from '../ast/getDifferencesOrThrow.ts';
 import { importJSONOrThrow } from './importJSONOrThrow.ts';
 
 /**

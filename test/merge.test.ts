@@ -1,5 +1,5 @@
 import { assertArrayIncludes, assertEquals } from 'jsr:@std/assert';
-import { merge } from '../merge.ts';
+import { merge } from '../src/util/merge.ts';
 
 Deno.test('merge simple case', () =>
 {

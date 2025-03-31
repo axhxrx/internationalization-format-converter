@@ -2,7 +2,7 @@ import { assertEquals } from 'jsr:@std/assert';
 import { walk } from 'jsr:@std/fs';
 import { join } from 'jsr:@std/path';
 
-import { loadLocalizationFromFileOrThrow } from '../loadLocalizationFromFile.ts';
+import { loadLocalizationFromFileOrThrow } from '../src/ast/loadLocalizationFromFile.ts';
 const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;
 const pathToCollection = join(pathToFixtures, 'collection');
 

@@ -1,6 +1,6 @@
 import { join } from '@std/path/join';
 import { assertEquals } from 'jsr:@std/assert';
-import { BatchExport } from '../BatchExport.ts';
+import { BatchExport } from '../src/batch/BatchExport.ts';
 import { assertTextFilesEqual } from './assertTextFilesEqual.ts';
 
 const pathToParent = './test'; // = new URL('.', import.meta.url).pathname;

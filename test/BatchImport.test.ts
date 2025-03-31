@@ -1,6 +1,6 @@
 import { copy, ensureDir } from '@std/fs';
 import { join, parse } from '@std/path';
-import { BatchImport, ImportOptions } from '../BatchImport.ts';
+import { BatchImport, ImportOptions } from '../src/batch/BatchImport.ts';
 import { assertTextFilesEqual } from './assertTextFilesEqual.ts';
 
 const pathToParent = './test'; // = new URL('.', import.meta.url).pathname;
