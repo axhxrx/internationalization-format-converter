@@ -1,9 +1,9 @@
 import { copy } from '@std/fs';
 import { join } from '@std/path/join';
 import { assertEquals } from 'jsr:@std/assert';
-import { BatchExport } from '../BatchExport.ts';
-import { convertToSimpleLocalizeFormat } from '../convertToSimpleLocalizeFormat.ts';
-import { splitByMaxLeafNodesOrThrow } from '../splitByMaxLeafNodes.ts';
+import { BatchExport } from '../src/batch/BatchExport.ts';
+import { convertToSimpleLocalizeFormat } from '../src/convert/convertToSimpleLocalizeFormat.ts';
+import { splitByMaxLeafNodesOrThrow } from '../src/util/splitByMaxLeafNodes.ts';
 import { assertTextFilesEqual } from './assertTextFilesEqual.ts';
 
 const pathToThis = new URL('./', import.meta.url).pathname;
