@@ -10,6 +10,7 @@ import {
 import { createTsProject } from './createTsProject.ts';
 import type { DiffResult } from './DiffResult.ts';
 import { getExportedVariableNamesAndValues } from './getExportedVariableNamesAndValues.ts';
+import { logger } from './Logger.ts';
 
 /**
  Local function to unwrap AsExpressions and TypeAssertions
@@ -78,7 +79,7 @@ function findAndModify(
 
   // Get the kind of the property for debugging reference. But, need to use asKind() to access the properties in a type-aware
   const kindName = property.getKindName();
-  console.log('kind', kindName);
+  logger.debug('AST', `Property kind: ${kindName}`);
 
   const shorthandPropertyAssignment = property.asKind(SyntaxKind.ShorthandPropertyAssignment);
 
@@ -148,11 +149,15 @@ function findAndModify(
 /**
  Given a `DiffResult` and a string containing TypeScript code for an *.i18n.ts file, this function applies the differences to the code using the TypeScript AST. It returns the modified code as a string — suitable for using as the content of a *.i18n.ts file.
 
- To make this work with minimal formatting changes, we use the TypeScript AST to modify the code, but we do that through `ts-morph` for this because using the TypeScript compiler directly makes it hard to avoid unwanted formatting changes.
+ To make this work with minimal formatting changes, we use the TypeScript AST to modify the code, but we do that using `ts-morph`, because using the TypeScript compiler directly makes it hard to avoid unwanted formatting changes.
 
  This function throws an error if the code is not valid or the format is incorrect or any other thing goes wrong.
  */
-export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string, debugInfo: Record<string, string>): {
+export function applyDifferencesUsingASTOrThrow(
+  diff: DiffResult,
+  tsCode: string,
+  debugInfo: Record<string, string>,
+): {
   originalCode: string;
   modifiedCode: string;
   appliedKeypaths: string[];
@@ -164,7 +169,7 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
 
   const { sourceFile } = createTsProject(tsCode);
 
-  console.warn(`DIFF: `, Deno.inspect(diff, { depth: 100, colors: true }));
+  logger.debug('AST', 'DIFF:', diff);
 
   const appliedKeypaths: string[] = [];
 
@@ -184,7 +189,7 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
 
   const exportedNamesAndValues = getExportedVariableNamesAndValues(sourceFile);
 
-  console.log('EXPORTED NAMES:', exportedNamesAndValues.map(e => e.name));
+  logger.info('AST', 'EXPORTED NAMES:', exportedNamesAndValues.map(e => e.name));
 
   // HERE I NEED TO FIGURE OUT THE NAMES OF ALL EXPORTED VARIABLES
   // diff is like:
@@ -204,23 +209,23 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
 
   for (const exportedConst of exportedConsts)
   {
-    console.log('exportedConst', exportedConst.getText());
+    logger.debug('AST', 'exportedConst', exportedConst.getText());
 
     const declarations = exportedConst.getDeclarations();
-    console.log('declarations', declarations.map(d => d.getText()));
+    logger.debug('AST', 'declarations', declarations.map(d => d.getText()));
 
     const declaration = declarations[0];
-    // console.log('declaration', declaration);
+    // logger.debug('AST', 'declaration', declaration);
 
     const name = declaration.getName();
-    console.log('dec[0] name', name);
+    logger.debug('AST', 'dec[0] name', name);
 
     const initializer = declaration.getInitializer();
-    console.log('initializer', initializer?.getKindName());
+    logger.debug('AST', 'initializer', initializer?.getKindName());
 
     if (!initializer)
     {
-      console.error('Exported constant has no initializer.');
+      logger.error('AST', 'Exported constant has no initializer.');
       throw new Error('Exported constant has no initializer.');
     }
 
@@ -275,13 +280,13 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
           continue;
         }
         const innerKeyPath = keyPath.slice(name.length + 1);
-        console.log('keyPath', keyPath);
-        console.log('innerKeyPath', innerKeyPath);
-        console.log('leftRight', leftRight);
+        logger.debug('AST', 'keyPath', keyPath);
+        logger.debug('AST', 'innerKeyPath', innerKeyPath);
+        logger.debug('AST', 'leftRight', leftRight);
 
         if (!leftRight.right)
         {
-          console.warn(`FIXME: No right value found for key: ${keyPath}`);
+          logger.warn('AST', `FIXME: No right value found for key: ${keyPath}`);
           // throw new Error(`No right value found for key: ${keyPath}`);
         }
         else
@@ -293,7 +298,7 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
           }
           else
           {
-            console.log('SKIP keypath: ', keyPath);
+            logger.debug('AST', 'SKIP keypath: ', keyPath);
           }
         }
       }
@@ -302,7 +307,7 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
     {
       // Reference case: export const i18n = fooI18n
       const identifier = unwrappedInitializer.getText();
-      console.log(`Export '${name}' references identifier '${identifier}'`);
+      logger.debug('AST', `Export '${name}' references identifier '${identifier}'`);
 
       // Try to handle this case by looking for a matching local variable
       // We'll pass the identifier directly to findAndModify which will look it up
@@ -313,13 +318,13 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
           continue;
         }
         const innerKeyPath = keyPath.slice(name.length + 1);
-        console.log('innerKeyPath', innerKeyPath);
-        console.log('leftRight', leftRight);
+        logger.debug('AST', 'innerKeyPath', innerKeyPath);
+        logger.debug('AST', 'leftRight', leftRight);
 
         if (!leftRight.right)
         {
           // throw new Error(`No right value found for key: ${keyPath}`);
-          console.warn(`FIXME: No right value found for key: ${keyPath}`);
+          logger.warn('AST', `FIXME: No right value found for key: ${keyPath}`);
         }
         else
         {
@@ -335,7 +340,7 @@ export function applyDifferencesUsingASTOrThrow(diff: DiffResult, tsCode: string
           }
           else
           {
-            console.log('SKIP keypath: ', keyPath);
+            logger.debug('AST', 'SKIP keypath: ', keyPath);
           }
         }
       }

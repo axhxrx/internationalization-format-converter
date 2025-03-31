@@ -54,7 +54,16 @@ export const loadLocalizationFromFileOrThrow = async (
 ): Promise<{ module: WhoKnows; originalCode: string; code: string; json: string }> =>
 {
   const filePath = path;
-  const importResult = await tryImportingCode({ filePath });
+
+  const originalCode = await Deno.readTextFile(filePath);
+  // console.log({ originalCode });
+
+  const code = await stripImports(originalCode);
+  const strippedTmpFile = await Deno.makeTempFile({ suffix: '.ts' });
+  await Deno.writeTextFile(strippedTmpFile, code);
+
+  // Once we have stripped the imports, we can import the code using Deno just as a sanity-check. (We could not import it using Deno without stripping the imports first, though, because the code might use monorepo-specific imports that Deno doesn't know about.)
+  const importResult = await tryImportingCode({ filePath: strippedTmpFile });
 
   if (!importResult.success)
   {
@@ -67,13 +76,6 @@ export const loadLocalizationFromFileOrThrow = async (
     console.error(`loadLocalizationFromFile: Invalid i18n structure: ${filePath}`);
     throw new Error(`loadLocalizationFromFile: Invalid i18n structure`);
   }
-
-  const originalCode = await Deno.readTextFile(filePath);
-  console.log({ originalCode });
-
-  const code = await stripImports(originalCode);
-  const strippedTmpFile = await Deno.makeTempFile({ suffix: '.ts' });
-  await Deno.writeTextFile(strippedTmpFile, code);
 
   const reimportResult = await tryImportingCode({ filePath: strippedTmpFile });
   if (!reimportResult.success)

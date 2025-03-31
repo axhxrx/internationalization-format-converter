@@ -1,335 +1,64 @@
-import { parseArgs } from 'jsr:@std/cli';
-import process from 'node:process';
-import { convertFromSimpleLocalizeFormat } from './convertFromSimpleLocalizeFormat.ts';
-import { convertToSimpleLocalizeFormat } from './convertToSimpleLocalizeFormat.ts';
-import { getDifferencesOrThrow } from './getDifferencesOrThrow.ts';
-import * as importJSONFileOrThrow from './importJSONFileOrThrow.ts';
-import { loadLocalizationFromFileOrThrow } from './loadLocalizationFromFile.ts';
+import { parseArgs } from '@std/cli';
+import { batchExportWithOptions } from './batchExportWithOptions.ts';
+import { batchImportWithOptions } from './batchImportWithOptions.ts';
+import { exportToJSONFile } from './exportToJSONFile.ts';
+import { importFromJSONFile } from './importFromJSONFile.ts';
+import { logger } from './Logger.ts';
+import { printHelp } from './printHelp.ts';
 
 /**
- Print help message
+ The `main()` function
+
+ @param testArgs Optional argument that can be a string or array of strings for testing CLI arguments
  */
-function printHelp()
+export async function main(testArgs?: string | string[], useCwd?: string): Promise<number>
 {
-  console.log(`@axhxrx/internationalization-format-converter
+  let argsToUse: string[];
 
-A tool for converting between TypeScript (*.i18n.ts) localization files and JSON.
-
-USAGE:
-  deno run -RWE mod.ts [COMMAND] [OPTIONS]
-
-COMMANDS:
-  export <ts_file> <json_file>      Export a *.i18n.ts file to JSON
-  import <json_file> <ts_file>      Import translations from JSON to a *.i18n.ts file
-  help                              Display this help message
-
-OPTIONS:
-  --derive                          When exporting, derive property names from file paths
-  --identifier=<name>                  When exporting, use a custom identifier for the root level
-  --dry-run, --dryRun               Preview changes without writing files
-  --simple-localize, --simpleLocalize   Use SimpleLocalize JSON format with locale keys at root level
-
-EXAMPLES:
-  deno run -RWE mod.ts export src/locales/foo.i18n.ts foo.json
-  deno run -RWE mod.ts export src/locales/foo.i18n.ts foo.json --derive
-  deno run -RWE mod.ts export src/locales/foo.i18n.ts foo.json --identifier=customName
-  deno run -RWE mod.ts export src/locales/foo.i18n.ts foo.json --simple-localize
-  deno run -RWE mod.ts import foo.json src/locales/foo.i18n.ts
-  deno run -RWE mod.ts import foo.json src/locales/foo.i18n.ts --dry-run
-  deno run -RWE mod.ts import foo.json src/locales/foo.i18n.ts --simple-localize
-`);
-}
-
-/**
- * Export a TypeScript-format localization to JSON without writing to disk.
- * Returns the result object containing JSON and other data.
- */
-export async function exportToJSON(
-  tsFile: string,
-  options: {
-    derive?: boolean;
-    identifier?: string;
-    printToStdout?: boolean;
-    simpleLocalizeFormat?: boolean;
-  } = {},
-)
-{
-  let rootLevelIdentifier: string | { derive: true } | undefined;
-
-  if (options.derive)
+  const originalCwd = Deno.cwd();
+  if (useCwd)
   {
-    rootLevelIdentifier = { derive: true };
-  }
-  else if (options.identifier)
-  {
-    rootLevelIdentifier = options.identifier;
+    Deno.chdir(useCwd);
   }
 
-  const result = await loadLocalizationFromFileOrThrow(tsFile, rootLevelIdentifier);
-
-  // If SimpleLocalize format is requested, transform the JSON
-  if (options.simpleLocalizeFormat)
+  if (testArgs !== undefined)
   {
-    const parsed = JSON.parse(result.json);
-    const transformed = convertToSimpleLocalizeFormat(parsed);
-    result.json = JSON.stringify(transformed, null, 2);
-  }
-
-  if (options.printToStdout)
-  {
-    console.log(result.json);
-  }
-
-  return result;
-}
-
-/**
- * Export a TypeScript-format localization (in the format defined by `@axhxrx/internationalization`)
- * to a JSON file. The purpose here is e.g. to integrate with some other system which can
- * interoperate with JSON but not our custom .ts format.
- */
-export async function exportToJSONFile(
-  tsFile: string,
-  jsonFile: string,
-  options: {
-    derive?: boolean;
-    identifier?: string;
-    dryRun?: boolean;
-    simpleLocalizeFormat?: boolean;
-  },
-)
-{
-  try
-  {
-    const result = await exportToJSON(tsFile, {
-      derive: options.derive,
-      identifier: options.identifier,
-      simpleLocalizeFormat: options.simpleLocalizeFormat,
-    });
-
-    if (options.dryRun)
+    // Handle test arguments
+    if (typeof testArgs === 'string')
     {
-      console.log(`[DRY RUN] Would export ${tsFile} to ${jsonFile}`);
-      console.log(`[DRY RUN] JSON content would have ${result.json.length} characters`);
-      if (options.simpleLocalizeFormat)
+      // Split string into array, respecting quoted arguments
+      const regex = /[^\s"]+|"([^"]*)"/gi;
+      argsToUse = [];
+      let match;
+
+      while ((match = regex.exec(testArgs)) !== null)
       {
-        console.log(`[DRY RUN] Using SimpleLocalize format with locale keys at root level`);
+        // If the match has a capturing group (quoted string), use that
+        argsToUse.push(match[1] ? match[1] : match[0]);
       }
     }
     else
     {
-      await Deno.writeTextFile(jsonFile, result.json);
-      console.log(`Successfully exported ${tsFile} to ${jsonFile}`);
-      if (options.simpleLocalizeFormat)
-      {
-        console.log(`Used SimpleLocalize format with locale keys at root level`);
-      }
-    }
-  }
-  catch (error)
-  {
-    const err = error instanceof Error ? error : new Error(`${error}`);
-    console.error(`Error exporting ${tsFile} to JSON:`, err.message);
-    Deno.exit(1);
-  }
-}
-
-/**
- * Import changes from a JSON string to a TypeScript source string.
- * Returns the updated TypeScript code without writing to disk.
- */
-export async function importFromJSON(
-  jsonContent: string,
-  tsContent: string,
-  options: {
-    showDiffs?: boolean;
-    simpleLocalizeFormat?: boolean;
-  } = {},
-)
-{
-  try
-  {
-    let jsonData = JSON.parse(jsonContent);
-
-    // Convert from SimpleLocalize format if needed
-    if (options.simpleLocalizeFormat)
-    {
-      jsonData = convertFromSimpleLocalizeFormat(jsonData);
-    }
-
-    if (options.showDiffs)
-    {
-      const differences = await getDifferencesOrThrow(jsonData, tsContent);
-      const changeCount = Object.keys(differences).length;
-
-      console.log(`Changes detected: ${changeCount}`);
-
-      if (changeCount > 0)
-      {
-        console.log(`Changes that would be made:`);
-        for (const [path, { left, right }] of Object.entries(differences))
-        {
-          console.log(`  - ${path}: "${left}" → "${right}"`);
-        }
-      }
-    }
-
-    // Convert jsonData back to string with the correct format
-    const processedJsonContent = JSON.stringify(jsonData, null, 2);
-
-    const updatedTsCode = await importJSONFileOrThrow.importJSONOrThrow(
-      processedJsonContent,
-      tsContent,
-    );
-    return updatedTsCode.modifiedCode;
-  }
-  catch (error)
-  {
-    throw error; // Let the caller handle errors
-  }
-}
-
-/**
- * Import changes from a JSON file (that was exported via `exportToJSON()`)
- * to a TypeScript file (in the format defined by `@axhxrx/internationalization`)
- */
-export async function importFromJSONFile(
-  jsonFile: string,
-  tsFile: string,
-  options: {
-    dryRun?: boolean;
-    simpleLocalizeFormat?: boolean;
-  } = {},
-)
-{
-  try
-  {
-    const jsonContent = await Deno.readTextFile(jsonFile);
-    const tsContent = await Deno.readTextFile(tsFile);
-
-    // For dry run, we need to calculate differences without applying them
-    if (options.dryRun)
-    {
-      try
-      {
-        let jsonData = JSON.parse(jsonContent);
-
-        // Convert from SimpleLocalize format if needed
-        if (options.simpleLocalizeFormat)
-        {
-          jsonData = convertFromSimpleLocalizeFormat(jsonData);
-          console.log(`[DRY RUN] Converting from SimpleLocalize format with locale keys at root level`);
-        }
-
-        const differences = await getDifferencesOrThrow(jsonData, tsContent);
-        const changeCount = Object.keys(differences).length;
-
-        console.log(`[DRY RUN] Would import from ${jsonFile} to ${tsFile}`);
-        console.log(`[DRY RUN] Changes detected: ${changeCount}`);
-
-        if (changeCount > 0)
-        {
-          console.log(`[DRY RUN] Changes that would be made:`);
-          for (const [path, { left, right }] of Object.entries(differences))
-          {
-            console.log(`  - ${path}: "${left}" → "${right}"`);
-          }
-        }
-        else
-        {
-          console.log(`[DRY RUN] No changes would be made`);
-        }
-      }
-      catch (diffError)
-      {
-        const err = diffError instanceof Error ? diffError : new Error(`${diffError}`);
-        console.error(`[DRY RUN] Error calculating differences:`, err.message);
-        Deno.exit(1);
-      }
-    }
-    else
-    {
-      const updatedTsCode = await importFromJSON(jsonContent, tsContent, {
-        simpleLocalizeFormat: options.simpleLocalizeFormat,
-      });
-      await Deno.writeTextFile(tsFile, updatedTsCode);
-      console.log(`Successfully imported changes from ${jsonFile} to ${tsFile}`);
-      if (options.simpleLocalizeFormat)
-      {
-        console.log(`Converted from SimpleLocalize format with locale keys at root level`);
-      }
-    }
-  }
-  catch (error)
-  {
-    const err = error instanceof Error ? error : new Error(`${error}`);
-    console.error(`Error importing from ${jsonFile}:`, err.message);
-    Deno.exit(1);
-  }
-}
-
-/**
- Import changes from a JSON object whose top-level keys are paths (to the corresponding TypeScript files) and values are JSON objects containing any new values to import. Specify `dryRun: true` to return the result without without writing to disk.
-
- @param jsonPathMap
-
- @param param1
- */
-export async function importFromJSONPathMap(jsonPathMap: Record<string, Record<string, any>>, {
-  dryRun,
-  simpleLocalizeFormat,
-}: {
-  dryRun?: boolean;
-  simpleLocalizeFormat?: boolean;
-} = {})
-{
-  const result = {
-    tsPathMap: {} as Record<string, string>,
-  };
-  for (const [jsonPath, jsonObject] of Object.entries(jsonPathMap))
-  {
-    const fullPath = await Deno.realPath(jsonPath);
-    const tsCode = await Deno.readTextFile(fullPath);
-    const updatedTsCode = await importFromJSON(JSON.stringify(jsonObject), tsCode, {
-      simpleLocalizeFormat,
-    });
-
-    // Use the path specified by the caller, not the realPath, so that callers can use relative paths:
-    result.tsPathMap[jsonPath] = updatedTsCode;
-  }
-
-  if (dryRun)
-  {
-    console.log(`[DRY RUN] Would import changes to the following files:`);
-    for (const [tsPath, updatedCode] of Object.entries(result.tsPathMap))
-    {
-      console.log(`  - ${tsPath}`);
+      // Use the array as is
+      argsToUse = testArgs;
     }
   }
   else
   {
-    for (const [tsPath, updatedCode] of Object.entries(result.tsPathMap))
-    {
-      await Deno.writeTextFile(tsPath, updatedCode);
-    }
+    // Use real CLI args when not in test mode
+    argsToUse = Deno.args;
   }
 
-  return result;
-}
-
-/**
- The `main()` function
- */
-export async function main()
-{
-  const args = parseArgs(Deno.args, {
+  const args = parseArgs(argsToUse, {
     boolean: ['derive', 'help', 'dry-run', 'dryRun', 'simple-localize', 'simpleLocalize'],
-    string: ['identifier'],
+    string: ['identifier', 'ext'],
+    collect: ['ext'],
     alias: {
       h: 'help',
       d: 'derive',
       i: 'identifier',
       s: 'simple-localize',
+      e: 'ext',
     },
   });
 
@@ -339,15 +68,14 @@ export async function main()
 
   const command = args._[0] as string;
 
-  console.warn('args', args);
-  console.warn(process.argv);
-
-  if (args.help || !command || !['export', 'import', 'help'].includes(command))
+  if (args.help || !command || !['export', 'import', 'help', 'batch-export', 'batch-import'].includes(command))
   {
     printHelp();
-    return;
+    Deno.chdir(originalCwd);
+    return 5;
   }
 
+  let exitStatus = 5;
   switch (command)
   {
     case 'help':
@@ -361,9 +89,9 @@ export async function main()
 
       if (!tsFile || !jsonFile)
       {
-        console.error('Error: Both TS file and JSON file paths are required for export command');
+        logger.error('CLI', 'Error: Both TS file path and JSON file path are required for export command');
         printHelp();
-        Deno.exit(1);
+        exitStatus = 1;
       }
 
       await exportToJSONFile(tsFile, jsonFile, {
@@ -382,9 +110,9 @@ export async function main()
 
       if (!jsonFile || !tsFile)
       {
-        console.error('Error: Both JSON file and TS file paths are required for import command');
+        logger.error('CLI', 'Error: Both JSON file path and TS file path are required for import command');
         printHelp();
-        Deno.exit(1);
+        exitStatus = 1;
       }
 
       await importFromJSONFile(jsonFile, tsFile, {
@@ -393,7 +121,62 @@ export async function main()
       });
       break;
     }
+
+    case 'batch-export':
+    {
+      const rootDir = args._[1] as string;
+      const outputFile = args._[2] as string;
+
+      if (!rootDir || !outputFile)
+      {
+        logger.error('CLI',
+          'Error: Both root directory and output JSON file paths are required for batch-export command');
+        printHelp();
+        exitStatus = 1;
+      }
+
+      // Get file extensions to search for, default to .i18n.ts if not specified
+      const fileExtensions = args.ext && (args.ext as string[]).length > 0
+        ? args.ext as string[]
+        : ['.i18n.ts'];
+
+      exitStatus = await batchExportWithOptions({
+        rootDir,
+        outputFile,
+        fileExtensions,
+        dryRun,
+        simpleLocalizeFormat,
+      });
+      break;
+    }
+
+    case 'batch-import':
+    {
+      const jsonFile = args._[1] as string;
+      const targetDir = args._[2] as string;
+
+      if (!jsonFile || !targetDir)
+      {
+        logger.error('CLI',
+          'Error: Both JSON file path and target directory path are required for batch-import command');
+        printHelp();
+        exitStatus = 1;
+      }
+
+      exitStatus = await batchImportWithOptions({
+        jsonFile,
+        targetDir,
+        dryRun,
+        simpleLocalizeFormat,
+      });
+      break;
+    }
   }
+  if (useCwd)
+  {
+    Deno.chdir(originalCwd);
+  }
+  return exitStatus;
 }
 
 if (import.meta.main)

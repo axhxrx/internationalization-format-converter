@@ -1,31 +1,36 @@
+// deno-lint-ignore-file no-explicit-any
 /**
- * Convert JSON with locale keys at leaf nodes to JSON with locale keys at the root level.
- * Preserves the nested structure for better organization.
- *
- * Example input:
- * {
- *   "foo": {
- *     "name": {
- *       "en": "Mason",
- *       "ja": "メイソン"
- *     }
- *   }
- * }
- *
- * Example output:
- * {
- *   "en": {
- *     "foo": {
- *       "name": "Mason"
- *     }
- *   },
- *   "ja": {
- *     "foo": {
- *       "name": "メイソン"
- *     }
- *   }
- * }
- */
+  Convert JSON with locale keys at leaf nodes to JSON with locale keys at the root level.
+  Preserves the nested structure for better organization.
+
+  Example input:
+  ```json
+  {
+    "foo": {
+      "name": {
+        "en": "Mason",
+        "ja": "メイソン"
+      }
+    }
+  }
+  ```
+
+  Example output:
+  ```json
+  {
+    "en": {
+      "foo": {
+        "name": "Mason"
+      }
+    },
+    "ja": {
+      "foo": {
+        "name": "メイソン"
+      }
+    }
+  }
+  ```
+  */
 export function convertToSimpleLocalizeFormat(jsonObject: Record<string, unknown>): Record<string, unknown>
 {
   const result: Record<string, any> = {};

@@ -1,8 +1,9 @@
 import { join } from '@std/path';
 
 import { convertFromSimpleLocalizeFormat } from '../convertFromSimpleLocalizeFormat.ts';
-import { loadLocalizationFromFileOrThrow } from '../loadLocalizationFromFile.ts';
-import { exportToJSON, exportToJSONFile, importFromJSON, importFromJSONFile, importFromJSONPathMap } from '../main.ts';
+import { exportToJSON } from '../exportToJSON.ts';
+import { exportToJSONFile } from '../exportToJSONFile.ts';
+import { importFromJSONPathMap } from '../importFromJSONPathMap.ts';
 import { mergeAll } from '../merge.ts';
 import { assertTextFilesEqual } from './assertTextFilesEqual.ts';
 

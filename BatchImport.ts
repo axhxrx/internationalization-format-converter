@@ -2,7 +2,7 @@ import { isAbsolute, join } from '@std/path';
 import { isLocalization } from '../internationalization/mod.ts';
 import { convertFromSimpleLocalizeFormat } from './convertFromSimpleLocalizeFormat.ts';
 import { DiffResult } from './DiffResult.ts';
-import { importJSONOrThrow } from './importJSONFileOrThrow.ts';
+import { importJSONOrThrow } from './importJSONOrThrow.ts';
 import { loadLocalizationFromFileOrThrow } from './loadLocalizationFromFile.ts';
 import type { SearchOptions } from './SearchOptions.ts';
 
@@ -97,6 +97,9 @@ export class BatchImport
     const paths = Object.keys(this.jsonPathMap);
     for (const possiblyRelativePath of paths)
     {
+      console.log('Processing path:', possiblyRelativePath);
+      console.log('Root path:', rootPath);
+
       const path = isAbsolute(possiblyRelativePath)
         ? possiblyRelativePath
         : join(rootPath ?? Deno.cwd(), possiblyRelativePath);

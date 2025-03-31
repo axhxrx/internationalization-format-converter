@@ -1,32 +1,38 @@
 /**
- * Convert SimpleLocalize JSON format back to our nested format with locales at leaf nodes.
- * Handles nested structures under locale keys.
- *
- * Example input:
- * {
- *   "en": {
- *     "foo": {
- *       "name": "Mason"
- *     }
- *   },
- *   "ja": {
- *     "foo": {
- *       "name": "メイソン"
- *     }
- *   }
- * }
- *
- * Example output:
- * {
- *   "foo": {
- *     "name": {
- *       "en": "Mason",
- *       "ja": "メイソン"
- *     }
- *   }
- * }
+ Convert SimpleLocalize JSON format back to our default nested format with locales at leaf nodes.
+ Handles nested structures under locale keys.
+
+ Example input:
+ ```json
+ {
+   "en": {
+     "foo": {
+       "name": "Mason"
+     }
+   },
+   "ja": {
+     "foo": {
+       "name": "メイソン"
+     }
+   }
+ }
+ ```
+
+ Example output:
+ ```json
+ {
+   "foo": {
+     "name": {
+       "en": "Mason",
+       "ja": "メイソン"
+     }
+   }
+ }
+ ```
  */
-export function convertFromSimpleLocalizeFormat(jsonObject: Record<string, unknown>): Record<string, unknown>
+export function convertFromSimpleLocalizeFormat(
+  jsonObject: Record<string, unknown>,
+): Record<string, unknown>
 {
   const result: Record<string, any> = {};
 
@@ -38,6 +44,7 @@ export function convertFromSimpleLocalizeFormat(jsonObject: Record<string, unkno
   // First, traverse the entire structure to find all paths
   const allPaths: string[][] = [];
 
+  // deno-lint-ignore no-explicit-any
   function collectPaths(obj: any, path: string[] = [])
   {
     if (obj && typeof obj === 'object' && !Array.isArray(obj))

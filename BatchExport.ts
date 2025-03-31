@@ -1,7 +1,9 @@
 import { walk } from '@std/fs';
-import { join, normalize, parse } from '@std/path';
-import { exportToJSONFile } from './main.ts';
+import { join, normalize, parse, relative } from '@std/path';
+import { exportToJSONFile } from './exportToJSONFile.ts';
 import type { SearchOptions } from './SearchOptions.ts';
+
+import { logger } from './Logger.ts';
 
 class ExportResult
 {
@@ -13,11 +15,8 @@ class ExportResult
   {}
 
   destination?: string;
-
   json?: string;
-
   jsonObj?: Record<string, unknown>;
-
   error?: unknown;
 }
 
@@ -28,6 +27,10 @@ interface ExportOptions
   printToStdout?: boolean;
   simpleLocalizeFormat?: boolean;
   outputFile?: string;
+  /**
+   If present, then the JSON path map created will have paths relative to this directory.
+   */
+  rootDir?: string;
 }
 
 const defaultSearchOptions: SearchOptions = {
@@ -64,6 +67,9 @@ export class BatchExport
     return this.tmpDir;
   }
 
+  /**
+   Finds all files to export, based on the search options, and creates a new `BatchExport` instance. The created instance does not do anything further until `run` is called.
+   */
   static async find(
     root: string,
     exportOptions: ExportOptions,
@@ -71,6 +77,7 @@ export class BatchExport
   )
   {
     const resolvedSearchOptions = searchOptions || defaultSearchOptions;
+    const resolvedExportOptions = { ...exportOptions, rootDir: root };
 
     const a = await Array.fromAsync(walk(root, {
       exts: resolvedSearchOptions.fileExtensions,
@@ -81,7 +88,7 @@ export class BatchExport
 
     const filePaths = a.map(x => x.path);
 
-    const result = new BatchExport(filePaths, exportOptions);
+    const result = new BatchExport(filePaths, resolvedExportOptions);
     result.searchOptions = resolvedSearchOptions;
 
     return result;
@@ -101,6 +108,8 @@ export class BatchExport
     this.tmpDir = Deno.makeTempDirSync();
   }
 
+  protected count: number = 0;
+
   /**
    Creates a temporary directory to store the JSON files, then tries to export each input file to a JSON file. If successful, returns a `CompletedBatchExport` object, otherwise a `FailedBatchExport` object. These types extend `BatchExport` with additional properties relating to the export results.
 
@@ -113,14 +122,14 @@ export class BatchExport
     {
       try
       {
-        this.log(`${path}: BEGIN`);
+        logger.debug('BATCH', `${path}: BEGIN`);
         result.state = 'in progress';
 
         const jsonPath = join(this.tmpDir, path + '.json');
         const normalizedPath = normalize(path);
         const _pathSegments = normalizedPath.split('/').filter(Boolean); // Using forward slash which Deno normalizes internally
         const { dir: _dir, base: _base, name: _name, ext: _ext } = parse(jsonPath); // Available path components
-        this.log('dir', _dir);
+        logger.debug('BATCH', 'dir', _dir);
 
         await Deno.mkdirSync(_dir, { recursive: true });
 
@@ -129,7 +138,7 @@ export class BatchExport
         result.json = await Deno.readTextFile(jsonPath);
         result.jsonObj = JSON.parse(result.json!);
 
-        this.log(`${path}: exported: ${jsonPath}`);
+        logger.debug('BATCH', `${path}: exported: ${jsonPath}`);
 
         result.state = 'complete';
       }
@@ -142,6 +151,8 @@ export class BatchExport
     return this.finalize();
   }
 
+  protected successCount: number = 0;
+
   async finalize(): Promise<CompletedBatchExport | FailedBatchExport>
   {
     const jsonObject: Record<string, unknown> = {};
@@ -149,8 +160,12 @@ export class BatchExport
     let error: unknown;
 
     const entries = Object.entries(this.inputs);
-    for (const [path, result] of entries)
+    for (const [_path, result] of entries)
     {
+      const path = this.exportOptions.rootDir
+        ? relative(this.exportOptions.rootDir, _path)
+        : _path;
+
       if (result.state === 'error')
       {
         error = result.error;
@@ -173,6 +188,7 @@ export class BatchExport
 
     if (!error)
     {
+      this.successCount = entries.length;
       if (this.exportOptions.outputFile)
       {
         await Deno.writeTextFile(this.exportOptions.outputFile, json);
@@ -183,20 +199,4 @@ export class BatchExport
       ? { ...this, state: 'error', error }
       : { ...this, state: 'complete', json, jsonObject };
   }
-
-  log(...args: unknown[])
-  {
-    console.log('BATCH: ', ...args);
-  }
 }
-
-const paths = [
-  'test/fixtures/insane-file-extensionless-import.ts',
-  'test/fixtures/hoge.nested.i18n.ts',
-  'test/fixtures/foo.i18n.ts',
-  'test/fixtures/bar.i18n.ts',
-];
-
-const batch = new BatchExport(paths, {});
-
-await batch.run();

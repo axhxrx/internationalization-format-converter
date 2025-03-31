@@ -1,5 +1,8 @@
 import { assertEquals } from '@std/assert';
 
+/**
+ Test util fn assets text contents of two files are equal
+ */
 export async function assertTextFilesEqual(path1: string, path2: string)
 {
   const rp1 = await Deno.realPath(path1);

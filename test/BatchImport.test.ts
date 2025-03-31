@@ -67,11 +67,11 @@ async function runImportTest(pathMap: Record<string, string>, pathToTmpSourceDir
   const pathToFinalConnect = join(pathToFinalOutputs, 'collection', 'libs', 'user-console', 'feature',
     'connect-web-console', 'src', 'lib', 'feature-connect-web-console', 'i18n.ts');
 
-  assertTextFilesEqual(pathToExpectedFinalFoo, pathToFinalFoo);
-  assertTextFilesEqual(pathToExpectedFinalBar, pathToFinalBar);
-  assertTextFilesEqual(pathToExpectedFinalHoge, pathToFinalHoge);
-  assertTextFilesEqual(pathToExpectedFinalInsane, pathToFinalInsane);
-  assertTextFilesEqual(pathToExpectedFinalConnect, pathToFinalConnect);
+  await assertTextFilesEqual(pathToExpectedFinalFoo, pathToFinalFoo);
+  await assertTextFilesEqual(pathToExpectedFinalBar, pathToFinalBar);
+  await assertTextFilesEqual(pathToExpectedFinalHoge, pathToFinalHoge);
+  await assertTextFilesEqual(pathToExpectedFinalInsane, pathToFinalInsane);
+  await assertTextFilesEqual(pathToExpectedFinalConnect, pathToFinalConnect);
 }
 
 Deno.test('BatchImport works (normal mode)', async () =>

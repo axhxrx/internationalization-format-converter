@@ -14,33 +14,35 @@ const path5 = join(pathToParent, 'fixtures', 'collection', 'libs', 'user-console
 
 const paths = [path1, path2, path3, path4, path5];
 
+const tmpDir = await Deno.makeTempDir();
+
 Deno.test('BatchExport works (default mode)', async () =>
 {
   const b = new BatchExport(paths, {
-    outputFile: 'BOONCH.json',
+    outputFile: join(tmpDir, 'BOONCH.json'),
   });
   const r = await b.run();
-  console.log(Deno.inspect(r, { depth: 3 }));
+  // console.log(Deno.inspect(r, { depth: 3 }));
   assertEquals(r.state, 'complete');
 
   const expected = join(pathToParent, 'BatchExport.test.expected.output.json');
-  const actual = join('.', 'BOONCH.json');
+  const actual = join(tmpDir, 'BOONCH.json');
 
-  assertTextFilesEqual(expected, actual);
+  await assertTextFilesEqual(expected, actual);
 });
 
 Deno.test('BatchExport works (SimpleLocalize mode)', async () =>
 {
   const b = new BatchExport(paths, {
-    outputFile: 'BOONCH2.json',
+    outputFile: join(tmpDir, 'BOONCH2.json'),
     simpleLocalizeFormat: true,
   });
   const r = await b.run();
-  console.log(Deno.inspect(r, { depth: 3 }));
+  // console.log(Deno.inspect(r, { depth: 3 }));
   assertEquals(r.state, 'complete');
 
   const expected = join(pathToParent, 'BatchExport.test.expected.output.alternate.json');
-  const actual = join('.', 'BOONCH2.json');
+  const actual = join(tmpDir, 'BOONCH2.json');
 
-  assertTextFilesEqual(expected, actual);
+  await assertTextFilesEqual(expected, actual);
 });
