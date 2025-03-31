@@ -26,7 +26,7 @@ Deno.test('BatchExport works (large, default mode)', async () =>
   console.log(Deno.inspect(r, { depth: 3 }));
   assertEquals(r.state, 'complete');
 
-  const expected = join(pathToEnclosingDir, 'test', 'BatchExport.test2.expected.output.json');
+  const expected = join(pathToEnclosingDir, 'test', 'fixtures', 'BatchExport.test2.expected.output.json');
   const actual = outputFile;
 
   await assertTextFilesEqual(expected, actual);

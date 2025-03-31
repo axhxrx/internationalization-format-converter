@@ -12,10 +12,10 @@ const pathToOriginalInsane = join(pathToParent, 'fixtures', 'insane-file-extensi
 const pathToOriginalConnect = join(pathToParent, 'fixtures', 'collection', 'libs', 'user-console', 'feature',
   'connect-web-console', 'src', 'lib', 'feature-connect-web-console', 'i18n.ts');
 
-const pathToUnmodifiedAlternate = join(pathToParent, 'BatchImport.test.unmodified.alternate.json');
-const pathToUnmodified = join(pathToParent, 'BatchImport.test.unmodified.json');
-const pathToModified = join(pathToParent, 'BatchImport.test.modified.json');
-const pathToModifiedAlternate = join(pathToParent, 'BatchImport.test.modified.alternate.json');
+const pathToUnmodifiedAlternate = join(pathToParent, 'fixtures', 'BatchImport.test.unmodified.alternate.json');
+const pathToUnmodified = join(pathToParent, 'fixtures', 'BatchImport.test.unmodified.json');
+const pathToModified = join(pathToParent, 'fixtures', 'BatchImport.test.modified.json');
+const pathToModifiedAlternate = join(pathToParent, 'fixtures', 'BatchImport.test.modified.alternate.json');
 
 const paths = [pathToOriginalFoo, pathToOriginalBar, pathToOriginalHoge, pathToOriginalInsane, pathToOriginalConnect,
   pathToUnmodified, pathToUnmodifiedAlternate, pathToModifiedAlternate, pathToModified];

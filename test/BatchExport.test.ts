@@ -25,7 +25,7 @@ Deno.test('BatchExport works (default mode)', async () =>
   // console.log(Deno.inspect(r, { depth: 3 }));
   assertEquals(r.state, 'complete');
 
-  const expected = join(pathToParent, 'BatchExport.test.expected.output.json');
+  const expected = join(pathToParent, 'fixtures', 'BatchExport.test.expected.output.json');
   const actual = join(tmpDir, 'BOONCH.json');
 
   await assertTextFilesEqual(expected, actual);
@@ -41,7 +41,7 @@ Deno.test('BatchExport works (SimpleLocalize mode)', async () =>
   // console.log(Deno.inspect(r, { depth: 3 }));
   assertEquals(r.state, 'complete');
 
-  const expected = join(pathToParent, 'BatchExport.test.expected.output.alternate.json');
+  const expected = join(pathToParent, 'fixtures', 'BatchExport.test.expected.output.alternate.json');
   const actual = join(tmpDir, 'BOONCH2.json');
 
   await assertTextFilesEqual(expected, actual);
