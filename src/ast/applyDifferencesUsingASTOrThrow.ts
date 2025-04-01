@@ -1,5 +1,6 @@
 import type {
   Expression,
+  NoSubstitutionTemplateLiteral,
   ObjectLiteralExpression,
   StringLiteral,
 } from '@ts-morph/ts-morph';
@@ -7,10 +8,10 @@ import {
   SyntaxKind,
 } from '@ts-morph/ts-morph';
 
+import { logger } from '../util/Logger.ts';
 import { createTsProject } from './createTsProject.ts';
 import type { DiffResult } from './DiffResult.ts';
 import { getExportedVariableNamesAndValues } from './getExportedVariableNamesAndValues.ts';
-import { logger } from '../util/Logger.ts';
 
 /**
  Local function to unwrap AsExpressions and TypeAssertions
@@ -126,9 +127,22 @@ function findAndModify(
       stringLiteral.formatText({ indentSize: 4 });
       return true;
     }
+    else if (unwrappedInitializer && unwrappedInitializer.asKind(SyntaxKind.NoSubstitutionTemplateLiteral))
+    {
+      // This code is the same as above, but for NoSubstitutionTemplateLiteral, and I keep it in its own block for now as I am not yet sure this is comprehensive
+      const noSubstitutionTemplateLiteral = unwrappedInitializer as NoSubstitutionTemplateLiteral;
+      noSubstitutionTemplateLiteral.setLiteralValue(newValue);
+      noSubstitutionTemplateLiteral.formatText({ indentSize: 4 });
+      return true;
+    }
     else
     {
-      throw new Error(`Expected string literal at path ${currentKey}`);
+      const initializerText = initializer.getText();
+      const initializerKind = initializer.getKindName();
+      console.error(
+        `WOOP WOOP! Expected string literal at path ${currentKey} (found ${initializerKind}: ${initializerText})`,
+      );
+      throw new Error(`Expected string literal at path ${currentKey} (found ${initializerKind}: ${initializerText})`);
     }
   }
   else if (unwrappedInitializer && unwrappedInitializer.asKind(SyntaxKind.ObjectLiteralExpression))

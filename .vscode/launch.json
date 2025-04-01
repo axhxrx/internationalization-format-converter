@@ -113,10 +113,34 @@
       "args": [
         "batch-export",
         "--simple-localize",
-        "/Volumes/SORACOM/ucm-sc-127403-implement-roundtrip-conversion-of-i18n-ts",
+        "${env:HOME}/WORK/ucm-sc-127403-implement-roundtrip-conversion-of-i18n-ts",
         "EXPORT-TEST.json",
         "--ext",
         "i18n.ts"
+      ],
+      "attachSimplePort": 9229
+    },
+    {
+      "request": "launch",
+      "name": "Debug BATCH IMPORT",
+      "type": "node",
+      "program": "${workspaceFolder}/mod.ts",
+      "cwd": "${workspaceFolder}",
+      "env": {},
+      "runtimeExecutable": "${env:HOME}/.deno/bin/deno",
+      "runtimeArgs": [
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--unstable-sloppy-imports",
+        "--inspect-wait",
+        "--allow-env"
+      ],
+      "args": [
+        "batch-import",
+        "--simple-localize",
+        "${env:HOME}/WORK/ucm-sc-127403-implement-roundtrip-conversion-of-i18n-ts/dist/simplelocalize.import.json",
+        "${env:HOME}/WORK/ucm-sc-127403-implement-roundtrip-conversion-of-i18n-ts",
       ],
       "attachSimplePort": 9229
     }

@@ -1,15 +1,9 @@
 import { isLocalization } from '@axhxrx/internationalization';
 import { isAbsolute, join } from '@std/path';
-import { DiffResult } from '../ast/DiffResult.ts';
+import type { DiffResult } from '../ast/DiffResult.ts';
 import { loadLocalizationFromFileOrThrow } from '../ast/loadLocalizationFromFile.ts';
-import type { SearchOptions } from '../cli/SearchOptions.ts';
 import { convertFromSimpleLocalizeFormat } from '../convert/convertFromSimpleLocalizeFormat.ts';
 import { importJSONOrThrow } from '../convert/importJSONOrThrow.ts';
-
-const defaultSearchOptions: SearchOptions = {
-  fileExtensions: ['.json'],
-  skip: [/node_modules/, /.git/],
-};
 
 interface CompletedBatchImport extends BatchImport
 {
@@ -51,6 +45,10 @@ export class ImportResult
     public error?: unknown,
   )
   {
+    if (error)
+    {
+      this.state = 'error';
+    }
   }
 }
 
@@ -150,7 +148,9 @@ export class BatchImport
       }
     }
 
-    return this.finalize();
+    const finalized = await this.finalize();
+
+    return finalized;
   }
 
   async finalize(): Promise<CompletedBatchImport | FailedBatchImport>

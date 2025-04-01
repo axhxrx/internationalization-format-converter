@@ -180,6 +180,16 @@ export async function main(testArgs?: string | string[], useCwd?: string): Promi
   {
     Deno.chdir(originalCwd);
   }
+
+  if (exitStatus !== 0)
+  {
+    console.error('💀 FAILED. There is probably error output above that may yield a clue. Exit status:', exitStatus);
+  }
+  else
+  {
+    console.log('✅ Success. Exit status:', exitStatus);
+  }
+
   return exitStatus;
 }
 
