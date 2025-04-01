@@ -58,6 +58,7 @@ export async function main(testArgs?: string | string[], useCwd?: string): Promi
       d: 'derive',
       i: 'identifier',
       s: 'simple-localize',
+      l: 'limit',
       e: 'ext',
     },
   });
@@ -140,12 +141,15 @@ export async function main(testArgs?: string | string[], useCwd?: string): Promi
         ? args.ext as string[]
         : ['.i18n.ts'];
 
+      const limit = args.limit ? Number(args.limit) : 0;
+
       exitStatus = await batchExportWithOptions({
         rootDir,
         outputFile,
         fileExtensions,
         dryRun,
         simpleLocalizeFormat,
+        limit,
       });
       break;
     }

@@ -8,13 +8,13 @@
       "request": "launch",
       "name": "Launch Program",
       "type": "node",
-      "program": "${workspaceFolder}/loadLocalizationFromFile.ts",
+      "program": "${fileDirname}/${fileBasename}",
       "cwd": "${workspaceFolder}",
       "env": {},
       "runtimeExecutable": "${env:HOME}/.deno/bin/deno",
       "runtimeArgs": [
         "run",
-        "--unstable",
+        "--unstable-sloppy-imports",
         "--inspect-wait",
         "--allow-all"
       ],
@@ -91,6 +91,32 @@
         "--derive",
         "foo.json",
         "test/fixtures/insane-file-extensionless-import.ts"
+      ],
+      "attachSimplePort": 9229
+    },
+    {
+      "request": "launch",
+      "name": "Debug BATCH EXPORT",
+      "type": "node",
+      "program": "${workspaceFolder}/mod.ts",
+      "cwd": "${workspaceFolder}",
+      "env": {},
+      "runtimeExecutable": "${env:HOME}/.deno/bin/deno",
+      "runtimeArgs": [
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--unstable-sloppy-imports",
+        "--inspect-wait",
+        "--allow-env"
+      ],
+      "args": [
+        "batch-export",
+        "--simple-localize",
+        "/Volumes/SORACOM/ucm-sc-127403-implement-roundtrip-conversion-of-i18n-ts",
+        "EXPORT-TEST.json",
+        "--ext",
+        "i18n.ts"
       ],
       "attachSimplePort": 9229
     }

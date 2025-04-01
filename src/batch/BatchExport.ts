@@ -1,13 +1,15 @@
 import { walk } from '@std/fs';
 import { join, normalize, parse, relative } from '@std/path';
-import { exportToJSONFile } from '../convert/exportToJSONFile.ts';
 import type { SearchOptions } from '../cli/SearchOptions.ts';
+import { exportToJSONFile } from '../convert/exportToJSONFile.ts';
 
+import { convertToSimpleLocalizeFormat } from '../convert/convertToSimpleLocalizeFormat.ts';
+import { countLeafNodes } from '../util/countLeafNodes.ts';
 import { logger } from '../util/Logger.ts';
 
 class ExportResult
 {
-  state: 'new' | 'in progress' | 'complete' | 'error' = 'new';
+  state: 'new' | 'in progress' | 'complete' | 'error' | 'skipped' = 'new';
 
   constructor(
     public path: string,
@@ -26,6 +28,7 @@ interface ExportOptions
   identifier?: string;
   printToStdout?: boolean;
   simpleLocalizeFormat?: boolean;
+  limit?: number;
   outputFile?: string;
   /**
    If present, then the JSON path map created will have paths relative to this directory.
@@ -118,6 +121,9 @@ export class BatchExport
   async run(): Promise<CompletedBatchExport | FailedBatchExport>
   {
     const entries = Object.entries(this.inputs);
+
+    let leafNodesExported = 0;
+
     for (const [path, result] of entries)
     {
       try
@@ -133,14 +139,34 @@ export class BatchExport
 
         await Deno.mkdirSync(_dir, { recursive: true });
 
-        const exportedJSONFile = await exportToJSONFile(path, jsonPath, this.exportOptions);
+        // The conversion to SimpleLocalize format can only be done after the conversion to JSON, on a per-file basis, so for a batch export, this means we need to disable it here and do it at the end:
+        const fileExportOptions = {
+          ...this.exportOptions,
+          simpleLocalizeFormat: false,
+        };
+
+        await exportToJSONFile(path, jsonPath, fileExportOptions);
+
         result.destination = jsonPath;
         result.json = await Deno.readTextFile(jsonPath);
-        result.jsonObj = JSON.parse(result.json!);
 
-        logger.debug('BATCH', `${path}: exported: ${jsonPath}`);
+        const jsonObj = JSON.parse(result.json);
 
-        result.state = 'complete';
+        const shouldProcessThisItem = this.exportOptions.limit
+          ? leafNodesExported + countLeafNodes(jsonObj) <= this.exportOptions.limit
+          : true;
+
+        if (shouldProcessThisItem)
+        {
+          leafNodesExported += countLeafNodes(jsonObj);
+          result.jsonObj = jsonObj;
+          result.state = 'complete';
+        }
+        else
+        {
+          result.state = 'skipped';
+          break;
+        }
       }
       catch (error)
       {
@@ -171,6 +197,10 @@ export class BatchExport
         error = result.error;
         break;
       }
+      else if (result.state === 'skipped')
+      {
+        continue;
+      }
       else
       {
         jsonObject[path] = result.jsonObj!;
@@ -179,7 +209,10 @@ export class BatchExport
 
     try
     {
-      json = JSON.stringify(jsonObject, null, 2);
+      const finalJsonObject = this.exportOptions.simpleLocalizeFormat
+        ? convertToSimpleLocalizeFormat(jsonObject)
+        : jsonObject;
+      json = JSON.stringify(finalJsonObject, null, 2);
     }
     catch (jsonErr)
     {
