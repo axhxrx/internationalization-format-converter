@@ -1,6 +1,6 @@
 import { assertEquals } from 'jsr:@std/assert';
 
-import { formatTypeScriptCode } from '../formatTypeScriptCode.ts';
+import { formatTypeScriptCode } from '../src/ast/formatTypeScriptCode.ts';
 
 Deno.test('formatTypeScriptCode formats TypeScript code correctly', async () =>
 {

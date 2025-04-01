@@ -1,0 +1,206 @@
+{
+  "test/fixtures/foo.i18n.ts": {
+    "foo": {
+      "name": {
+        "en": "Mason",
+        "ja": "メイソン"
+      },
+      "greeting": {
+        "friendly": {
+          "en": "Hello, {name}!",
+          "ja": "こんにちは、{name}さん！"
+        },
+        "hostile": {
+          "en": "Get lost, {name}!",
+          "ja": "何だ、{name}！"
+        }
+      }
+    }
+  },
+  "test/fixtures/bar.i18n.ts": {
+    "bar": {
+      "nickname": {
+        "en": "Princess",
+        "ja": "プリンセス"
+      },
+      "greeting": {
+        "friendly": {
+          "en": "Greetings, exalted {name}!",
+          "ja": "こんにちは、{name}様！"
+        },
+        "hostile": {
+          "en": "You do not look like royalty, {name}!",
+          "ja": "おまえはプリンセスぽくねぇ、{name}！"
+        }
+      }
+    }
+  },
+  "test/fixtures/hoge.nested.i18n.ts": {
+    "hoge": {
+      "favorite": {
+        "food": {
+          "en": "pizza",
+          "ja": "ピザ"
+        },
+        "drink": {
+          "alcoholic": {
+            "en": "whiskey",
+            "ja": "ウイスキー"
+          },
+          "nonAlcoholic": {
+            "en": "water",
+            "ja": "水"
+          }
+        }
+      },
+      "nested2": {
+        "moreDeeplyNested": {
+          "wowser": {
+            "en": "The nested property should be completely erased becuase it contains nothing but import references, but nested2 should remain because I, wowser, exist",
+            "ja": "なんか、俺いるぞ"
+          }
+        }
+      }
+    }
+  },
+  "test/fixtures/insane-file-extensionless-import.ts": {
+    "derpola": {
+      "fooI18n": {
+        "name": {
+          "en": "foo",
+          "ja": "フー"
+        }
+      },
+      "barI18n": {
+        "name": {
+          "en": "bar",
+          "ja": "バー"
+        }
+      }
+    },
+    "hoge2": {
+      "fooI18n": {
+        "name": {
+          "en": "foo",
+          "ja": "フー"
+        }
+      },
+      "barI18n": {
+        "name": {
+          "en": "bar",
+          "ja": "バー"
+        }
+      }
+    },
+    "i18n": {
+      "name": {
+        "en": "foo",
+        "ja": "フー"
+      }
+    },
+    "nardwacker": {
+      "barI18n": {
+        "name": {
+          "en": "bar",
+          "ja": "バー"
+        }
+      },
+      "fooI18n": {
+        "name": {
+          "en": "foo",
+          "ja": "フー"
+        }
+      }
+    }
+  },
+  "test/fixtures/collection/libs/user-console/feature/connect-web-console/src/lib/feature-connect-web-console/i18n.ts": {
+    "ConnectWebConsoleActionI18n": {
+      "title": {
+        "en": "Connect using web terminal",
+        "ja": "Web ターミナルを使用して接続"
+      },
+      "description": {
+        "en": "Securely connect to your device using a web terminal running in the browser and On-demand Remote Access (Quoracomm Quapcha).",
+        "ja": "ブラウザで利用できる Web ターミナルとオンデマンドリモートアクセス（QUORACOMM Quapcha）を使用して、デバイスに安全に接続します。"
+      },
+      "headerTag": {
+        "en": "Quoracomm Quapcha",
+        "ja": "Quoracomm Quapcha"
+      },
+      "status": {
+        "online": {
+          "en": "ONLINE",
+          "ja": "オンライン"
+        },
+        "offline": {
+          "en": "OFFLINE",
+          "ja": "オフライン"
+        }
+      },
+      "noSubscriberOnline": {
+        "en": "No subscribers are online",
+        "ja": "オンラインのサブスクライバーはありません"
+      },
+      "labels": {
+        "connectUsing": {
+          "en": "Connect using",
+          "ja": "接続方法"
+        },
+        "protocol": {
+          "en": "Protocol",
+          "ja": "プロトコル"
+        },
+        "port": {
+          "en": "Port",
+          "ja": "デバイス側ポート"
+        },
+        "timeout": {
+          "en": "Access allowed for",
+          "ja": "アクセス可能時間"
+        }
+      },
+      "timeoutTime": {
+        "thirtyMinutes": {
+          "en": "30 minutes",
+          "ja": "30分"
+        },
+        "oneHour": {
+          "en": "1 hour",
+          "ja": "1時間"
+        },
+        "twoHours": {
+          "en": "2 hours",
+          "ja": "2時間"
+        },
+        "fourHours": {
+          "en": "4 hours",
+          "ja": "4時間"
+        },
+        "eightHours": {
+          "en": "8 hours",
+          "ja": "8時間"
+        }
+      },
+      "enableInfo": {
+        "en": "Enabling web terminal for this SIM will incur <a href=\"https://developers.example.com/en/docs/reference/fees/#quoracomm-quapcha\" target=\"_blank\">Quoracomm Quapcha usage fees<i class=\"ds-icon --icon-arrow-top-right --tiny\"></i></a>",
+        "ja": "Web ターミナルを利用すると、<a href=\"https://quoracomm.jp/services/quapcha/price/\" target=\"_blank\">QUORACOMM Quapcha の月額料金<i class=\"ds-icon --icon-arrow-top-right --tiny\"></i></a>が発生します"
+      },
+      "buttons": {
+        "cancel": {
+          "en": "Cancel",
+          "ja": "キャンセル"
+        },
+        "launch": {
+          "en": "Launch web terminal",
+          "ja": "Web ターミナルを起動"
+        }
+      },
+      "validation": {
+        "port": {
+          "en": "Port is required",
+          "ja": "ポートを入力してください"
+        }
+      }
+    }
+  }
+}

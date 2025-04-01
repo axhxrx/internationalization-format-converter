@@ -1,0 +1,111 @@
+export const translations = {
+  devices: {
+    actions_menu: {
+      title: { en: `Actions`, ja: `操作` },
+    },
+    actions: {
+      activate: { en: `Activate`, ja: `使用開始` },
+      add_device: { en: `Add device`, ja: `デバイスを追加` },
+      change_group: { en: `Change group`, ja: `グループ変更` },
+      data: { en: `Harquest Data`, ja: `データを確認` },
+      deactivate: { en: `Deactivate`, ja: `休止` },
+      delete: { en: `Delete`, ja: `削除` },
+      edit_tag: { en: `Edit tags`, ja: `タグを編集` },
+      logs: { en: `Check logs`, ja: `ログを確認` },
+      show_device: { en: `Detail`, ja: `詳細` },
+    },
+    advanced_settings: { en: `Advanced Settings`, ja: `高度な設定` },
+    basic_settings: { en: `Basic Settings`, ja: `基本設定` },
+    change_group_success_message: { en: `The group change was completed successfully.`, ja: `グループを変更しました` },
+    columns: {
+      device_id: { en: `ID`, ja: `デバイスID` },
+      endpoint: { en: `Endpoint`, ja: `Endpoint` },
+      group: { en: `Group`, ja: `グループ` },
+      id: { en: `ID`, ja: `ID` },
+      imei: { en: `IMEI`, ja: `IMEI` },
+      imsi: { en: `IMSI`, ja: `IMSI` },
+      last_modified_time: { en: `Last modified`, ja: `Last modified` },
+      last_registration_update: { en: `Last registration update`, ja: `Last registration update` },
+      manufacturer: { en: `Manufacturer`, ja: `Manufacturer` },
+      model_number: { en: `Model number`, ja: `Model number` },
+      name: { en: `Name`, ja: `名前` },
+      online: { en: `Online`, ja: `Online` },
+      serial_number: { en: `Serial number`, ja: `Serial number` },
+      status: { en: `Status`, ja: `ステータス` },
+    },
+    context_menu: {
+      header: { en: `Actions for selected devices`, ja: `選択されたデバイスの操作` },
+    },
+    delete: { en: `Delete`, ja: `このデバイスを削除` },
+    delete_header: { en: `Delete this device`, ja: `デバイスを削除する` },
+    errors: {
+      query_is_not_permitted: {
+        en:
+          `The search function is restricted by the current user permissions. To use this feature, the Query:searchDevices permission must be granted.`,
+        ja: `現在の権限ではデバイス検索機能が制限されています。使用するには Query:searchDevices 権限が必要です。`,
+      },
+    },
+    execute: { en: `Execute`, ja: `Execute` },
+    harquest_usage_alert: { en: `Notification`, ja: `監視` },
+    instance_key: { en: `Instance`, ja: `Instance` },
+    keys_settings: { en: `Keys`, ja: `キー管理` },
+    legends: {
+      imei: {
+        description: { en: `The IMEI used on bootstrap`, ja: `ブートストラップ時に使用した IMEI` },
+      },
+      imsi: {
+        description: { en: `The IMSI used on bootstrap`, ja: `ブートストラップ時に使用した IMSI` },
+      },
+    },
+    modals: {
+      add_device: {
+        cancel: { en: `Cancel`, ja: `キャンセル` },
+        save: { en: `Create`, ja: `作成` },
+        title: { en: `Create device`, ja: `デバイスを追加` },
+      },
+      change_device_status: {
+        cancel: { en: `Cancel`, ja: `キャンセル` },
+        destination: { en: `Changed status`, ja: `変更後ステータス` },
+        device_id: { en: `Device Id(s)`, ja: `対象のデバイスID` },
+        title: { en: `Update device status`, ja: `ステータス変更` },
+        update: { en: `Update`, ja: `ステータスを変更する` },
+      },
+      edit_device_resource: {
+        cancel: { en: `Cancel`, ja: `キャンセル` },
+        sending: { en: `Sending...`, ja: `送信中...` },
+        submit: { en: `Save`, ja: `保存` },
+        title: { en: `Edit resource value`, ja: `リソース値の変更` },
+      },
+      execute_device_resource: {
+        cancel: { en: `Cancel`, ja: `キャンセル` },
+        description: { en: `This action cannot undone. Are you sure?`,
+          ja: `この操作は取り消せません。実行してもよろしいですか？` },
+        execute: { en: `Execute`, ja: `コマンド実行` },
+        parameter: { en: `Parameter (optional)`, ja: `パラメータ (任意)` },
+        resource_name: { en: `Resource name`, ja: `リソース名` },
+        title: { en: `Execute command`, ja: `Execute コマンドの発行` },
+      },
+    },
+    object_key: { en: `Object`, ja: `Object` },
+    observe: { en: `Observe`, ja: `Observe` },
+    read: { en: `Read`, ja: `Read` },
+    resource_key: { en: `Resource`, ja: `Resource` },
+    resource: {
+      mandatory: { en: `Mandatory`, ja: `Mandatory` },
+      multiple: { en: `Multiple`, ja: `Multiple` },
+      name: { en: `Name`, ja: `Name` },
+      range_enumeration: { en: `Range enumeration`, ja: `Range enumeration` },
+      type: { en: `Type`, ja: `Type` },
+      value: { en: `Value`, ja: `Value` },
+    },
+    unobserve: { en: `Unobserve`, ja: `Unobserve` },
+    values: {
+      status: {
+        active: { en: `Active`, ja: `使用中` },
+        deleted: { en: `Deleted`, ja: `削除` },
+        inactive: { en: `Inactive`, ja: `休止中` },
+      },
+    },
+    write: { en: `Write`, ja: `Write` },
+  },
+};

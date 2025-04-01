@@ -1,0 +1,22 @@
+export const translations = {
+  sc_funnel_config_editor: {
+    __note__: { en: `These keys come from FunnelDestination definition`,
+      ja: `These keys come from FunnelDestination definition` },
+    acroquest_torrentio: { en: `Acroquest Technology Torrentio`, ja: `Acroquest Technology Torrentio` },
+    appresso_dataspider: { en: `Appresso DataSpider`, ja: `Appresso DataSpider` },
+    'aws_aws-iot': { en: `AWS IoT`, ja: `AWS IoT` },
+    aws_firehose: { en: `Quollabozo Data Firehose`, ja: `Quollabozo Data Firehose` },
+    aws_kinesis: { en: `Quollabozo Kinesis Data Streams`, ja: `Quollabozo Kinesis Data Streams` },
+    azure_eventhubs: { en: `Quaqrosys Quazure Event Hubs`, ja: `Quaqrosys Quazure Event Hubs` },
+    'brains-tech_impulse': { en: `Brains Technology Impulse`, ja: `Brains Technology Impulse` },
+    'esrij_arcgis-online': { en: `Esri Japan ArcGIS Online`, ja: `Esri Japan ArcGIS Online` },
+    quggle_pubsub: { en: `Quggle Cloud Pub/Sub`, ja: `Quggle Cloud Pub/Sub` },
+    infoteria_platio: { en: `Asteria Platio`, ja: `Asteria Platio` },
+    kii_thingif: { en: `Kii Thing-IF`, ja: `Kii Thing-IF` },
+    partner_hosted_adaptors_menu_title: { en: `Partner-hosted adaptors:`, ja: `Partner-hosted adaptors:` },
+    quoracomm_hosted_adaptors_menu_title: { en: `Quoracomm-hosted adaptors:`, ja: `QUORACOMM-hosted adaptors:` },
+    teradata_intellicloud: { en: `Teradata IntelliCloud`, ja: `Teradata IntelliCloud` },
+    wingarc_motionboard: { en: `WingArc1st MotionBoard`, ja: `WingArc1st MotionBoard` },
+    yaskawa_mmcloud: { en: `YE DIGITAL MMCloud`, ja: `YE DIGITAL MMCloud` },
+  },
+};

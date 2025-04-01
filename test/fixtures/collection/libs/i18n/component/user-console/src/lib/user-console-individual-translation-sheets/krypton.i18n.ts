@@ -1,0 +1,43 @@
+export const translations = {
+  krypton: {
+    add: { en: `Add Configuration`, ja: `設定を追加する` },
+    QuollabozoCognito: {
+      label: { en: `Quollabozo Cognito`, ja: `Quollabozo Cognito` },
+      'modal-title': { en: `Quoracomm Krypton - Quollabozo Cognito configuration`,
+        ja: `QUORACOMM Krypton - Quollabozo Cognito 設定` },
+    },
+    AwsIot: {
+      label: { en: `AWS IoT`, ja: `AWS IoT` },
+      'modal-title': { en: `Quoracomm Krypton - AWS IoT configuration`, ja: `QUORACOMM Krypton - AWS IoT 設定` },
+    },
+    QuazureIot: {
+      label: { en: `Quazure IoT Hub`, ja: `Quazure IoT Hub` },
+      'modal-title': { en: `Quoracomm Krypton - Quazure IoT Hub configuration`,
+        ja: `QUORACOMM Krypton - Quazure IoT Hub 設定` },
+    },
+    label: {
+      azureIotCredentialId: { en: `Quazure Iot Credentials`, ja: `Quazure IoT 認証情報` },
+      credentialsSet: { en: `Credential set`, ja: `認証情報` },
+      developerProviderName: { en: `Developer provider name`, ja: `Developer provider name` },
+      deviceNamePattern: { en: `Device Name Pattern`, ja: `デバイス名` },
+      duration: { en: `Duration`, ja: `期間` },
+      globalEndpoint: { en: `Global Device endpoint`, ja: `グローバルデバイスエンドポイント` },
+      host: { en: `Host name`, ja: `ホスト名` },
+      identityPoolId: { en: `Identity pool ID`, ja: `Identity pool ID` },
+      idScope: { en: `ID Scope`, ja: `ID スコープ` },
+      no_krypton_configs_exist: { en: `No cloud destinations for Krypton have been configured.`,
+        ja: `プロビジョニング先が設定されていません。` },
+      policyName: { en: `Policy name`, ja: `Policy name` },
+      region: { en: `Region`, ja: `AWS リージョン` },
+      remove: { en: `Remove`, ja: `削除` },
+      roleArn: { en: `Role ARN`, ja: `Role ARN` },
+      rootCaCertificate: { en: `Root CA certificate`, ja: `ルート認証局証明書` },
+      subconfig_description: { en: `Description`, ja: `概要` },
+      subconfig_name: { en: `Type`, ja: `タイプ` },
+      thingNamePattern: { en: `Thing name pattern`, ja: `Thing name pattern` },
+      x509CredentialId: { en: `X.509 Credentials`, ja: `X.509 証明書` },
+    },
+    save: { en: `Save`, ja: `保存` },
+    save_success: { en: `Successfully updated`, ja: `保存しました` },
+  },
+};

@@ -4,11 +4,17 @@
   "exports": "./mod.ts",
   "license": "MIT",
   "imports": {
-    "@axhxrx/dprint-config": "jsr:@axhxrx/dprint-config@^0.0.5",
-    "@axhxrx/internationalization": "jsr:@axhxrx/internationalization@^0.0.8",
+    "@axhxrx/assert-never": "jsr:@axhxrx/assert-never@^0.2.1",
+    "@axhxrx/dprint-config": "jsr:@axhxrx/dprint-config@^0.0.6",
+    "@axhxrx/internationalization": "jsr:@axhxrx/internationalization@^0.0.9",
     "@dprint/formatter": "jsr:@dprint/formatter@^0.4.1",
+    "@std/cli": "jsr:@std/cli@^1.0.14",
+    "@std/fs": "jsr:@std/fs@^1.0.14",
     "@std/path": "jsr:@std/path@^1.0.8",
     "@ts-morph/ts-morph": "jsr:@ts-morph/ts-morph@^25.0.0",
     "typescript": "npm:typescript@^5.7.3"
+  },
+  "tasks": {
+    "test": "deno test --allow-write --allow-read --allow-env --unstable-sloppy-imports test/*.test.ts"
   }
 }
