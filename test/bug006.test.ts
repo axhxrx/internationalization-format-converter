@@ -63,17 +63,11 @@ Deno.test('Spitballing the batch export/import process', async () =>
     simpleLocalizeFormat: true,
   });
 
-  console.log(jsonRoot);
-  console.log(jsonHoge);
-  console.log(jsonFoo);
-  console.log(jsonBar);
-
   const jsonObjects: Record<string, any>[] = [jsonRoot, jsonHoge, jsonFoo, jsonBar].map((json) =>
     JSON.parse(json.json)
   );
 
   const mergedJSONResult = mergeAll(jsonObjects, 'ERROR');
-  console.log(mergedJSONResult);
 
   if (!mergedJSONResult.success)
   {
@@ -82,8 +76,6 @@ Deno.test('Spitballing the batch export/import process', async () =>
 
   const mergedJSONObject = mergedJSONResult.value as Record<string, any>;
   const mergedJSONString = JSON.stringify(mergedJSONObject, null, 2);
-
-  console.log('Merged JSON:', mergedJSONString);
 
   // OK, now we have exported everything to JSON. Let's modify the JSON and re-import it into the files:
 

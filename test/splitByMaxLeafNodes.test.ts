@@ -19,7 +19,6 @@ Deno.test('splitByMaxLeafNodesOrThrow splits object exceeding limit', () =>
   };
 
   const result = splitByMaxLeafNodesOrThrow(obj, 3);
-  console.log(Deno.inspect(result, { depth: 3 }));
 
   assertEquals(result.length, 3);
   // Check that all keys from original object are preserved across result objects

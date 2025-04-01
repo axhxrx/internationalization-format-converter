@@ -11,7 +11,7 @@ Deno.test('stripImports works basically', async () =>
   const fileContents = await Deno.readTextFile(modulePath);
   const strippedContents = await stripImports(fileContents);
 
-  console.log(strippedContents);
+  // console.log(strippedContents);
 
   const expected = Deno.readTextFileSync(pathToFixtures + 'baz.i18n.stripped.ts');
   assertEquals(strippedContents, expected);

@@ -31,13 +31,13 @@ Deno.test('Regression test for crashing bug on certain .i18n.ts files', async ()
     const fileContents = await Deno.readTextFile(modulePath);
     const strippedContents = await stripImports(fileContents);
 
-    console.log('Stripped contents:',
-      strippedContents.length > 100 ? strippedContents.slice(0, 100) + '...' : strippedContents);
+    // console.log('Stripped contents:',
+    //   strippedContents.length > 100 ? strippedContents.slice(0, 100) + '...' : strippedContents);
 
     // If strippedContents is empty, we should consider the test passing
     if (strippedContents.trim() === '')
     {
-      console.log('Empty stripped contents is valid for this test case');
+      // console.log('Empty stripped contents is valid for this test case');
     }
     else
     {

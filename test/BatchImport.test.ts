@@ -35,7 +35,6 @@ async function runImportTest(pathMap: Record<string, string>, pathToTmpSourceDir
 
   const b = new BatchImport(pathMap, importOptions);
   const r = await b.run(pathToTmpSourceDir);
-  console.log(Deno.inspect(r, { depth: 3 }));
 
   const pathToExpectedFinalFoo = join(pathToParent, 'BatchImport.test.expected.outputs', 'normal', 'foo.i18n.ts');
   const pathToExpectedFinalBar = join(pathToParent, 'BatchImport.test.expected.outputs', 'normal', 'bar.i18n.ts');

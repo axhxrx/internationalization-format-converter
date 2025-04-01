@@ -11,9 +11,7 @@ const bazInputFile = pathToFixtures + 'baz.i18n.ts';
 Deno.test('toJSON converts input file to expected JSON (foo)', async () =>
 {
   const modulePath = pathToFixtures + 'foo.i18n.ts';
-  console.log(modulePath);
   const { module, originalCode, code } = await loadLocalizationFromFileOrThrow(modulePath);
-  console.log({ module, originalCode, code });
   const j = JSON.stringify(module, null, 2);
   const expected = Deno.readTextFileSync(pathToFixtures + 'foo.i18n.json');
   assertEquals(j, expected);
@@ -23,7 +21,6 @@ Deno.test('toJSON converts input file to expected JSON (bar)', async () =>
 {
   const modulePath = pathToFixtures + 'bar.i18n.ts';
   const x = await loadLocalizationFromFileOrThrow(modulePath);
-  console.log(x);
   const j = JSON.stringify(x.module, null, 2);
   const expected = Deno.readTextFileSync(pathToFixtures + 'bar.i18n.json');
   assertEquals(j, expected);
@@ -114,7 +111,7 @@ Deno.test('toJSON with multiple files and derived file path-based identifiers', 
 
   const actual = JSON.stringify(all, null, 2);
 
-  console.log(actual);
+  // console.log(actual);
 
   const expected = Deno.readTextFileSync(pathToFixtures + 'foo-bar-baz.combined.derived-identifiers.json');
 

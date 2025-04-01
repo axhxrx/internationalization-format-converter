@@ -16,8 +16,5 @@ export const batchExportWithOptions = async (options: BatchExportOptions): Promi
 {
   const b = await BatchExport.find(options.rootDir, options);
   const r = await b.run();
-
-  // console.log(Deno.inspect(r, { depth: 3 }));
-
   return r.state === 'complete' ? 0 : 1;
 };

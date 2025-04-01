@@ -22,7 +22,6 @@ export function copyWithMaxLeafNodeCount(jsonObj: Record<string, NestedStringRec
     {
       result[key] = nextTopLevelObject;
       count += additionalLeafNodes;
-      console.log(`Added ${key} with ${additionalLeafNodes} leaf nodes, total is ${count}`);
     }
     else
     {

@@ -15,6 +15,5 @@ export const importJSONOrThrow = async (jsonText: string, tsCode: string,
   const jsonObj = JSON.parse(jsonText);
   const differences = await getDifferencesOrThrow(jsonObj, tsCode);
   const result = applyDifferencesUsingASTOrThrow(differences, tsCode, debugInfo);
-  console.log('importJSONOrThrow():', result);
   return result;
 };

@@ -4,6 +4,7 @@ import type { DiffResult } from '../ast/DiffResult.ts';
 import { loadLocalizationFromFileOrThrow } from '../ast/loadLocalizationFromFile.ts';
 import { convertFromSimpleLocalizeFormat } from '../convert/convertFromSimpleLocalizeFormat.ts';
 import { importJSONOrThrow } from '../convert/importJSONOrThrow.ts';
+import logger from '../util/Logger.ts';
 
 interface CompletedBatchImport extends BatchImport
 {
@@ -91,8 +92,8 @@ export class BatchImport
     const paths = Object.keys(this.jsonPathMap);
     for (const possiblyRelativePath of paths)
     {
-      console.log('Processing path:', possiblyRelativePath);
-      console.log('Root path:', rootPath);
+      logger.debug('BATCH', 'Processing path:', possiblyRelativePath);
+      logger.debug('BATCH', 'Root path:', rootPath);
 
       const path = isAbsolute(possiblyRelativePath)
         ? possiblyRelativePath
@@ -138,7 +139,7 @@ export class BatchImport
           this.inputs[path].appliedKeypaths = appliedKeypaths ?? [];
           this.inputs[path].diff = diff ?? {};
 
-          console.log(`Successfully imported JSON for path: ${path}`);
+          logger.debug('BATCH', `Successfully imported JSON for path: ${path}`);
         }
         catch (error)
         {
@@ -173,7 +174,7 @@ export class BatchImport
         {
           await Deno.writeTextFile(typescriptDestination, typescriptSource);
         }
-        console.log(`Successfully imported JSON for path: ${path}`, result.appliedKeypaths?.join(', '));
+        logger.debug('BATCH', `Successfully imported JSON for path: ${path}`, result.appliedKeypaths?.join(', '));
       }
     }
     return { ...this, state: 'complete', json: '', jsonObject: {} };

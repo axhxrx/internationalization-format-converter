@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { isLocalization, isLocalizedUnit, type Localization } from '@axhxrx/internationalization';
+import logger from '../util/Logger.ts';
 import type { DiffResult } from './DiffResult.ts';
 import { loadLocalizationFileContentsOrThrow } from './loadLocalizationFromFile.ts';
 import { stripImports } from './stripImports.ts';
@@ -109,7 +110,7 @@ export const getDifferencesOrThrow = async (
   tsSourceCode: string,
 ): Promise<DiffResult> =>
 {
-  console.log('jsonObj', jsonObj);
+  logger.debug('AST', 'jsonObj', jsonObj);
 
   function compare(obj1: any, obj2: any, path: string)
   {

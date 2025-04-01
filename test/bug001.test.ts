@@ -13,7 +13,7 @@ Deno.test('Regression test for crashing bug on certain .i18n.ts files', async ()
   const fileContents = await Deno.readTextFile(modulePath);
   const strippedContents = await stripImports(fileContents);
 
-  console.log(strippedContents);
+  // console.log(strippedContents);
 
   // If strippedContents is empty, we should consider the test passing without trying to import it
   if (strippedContents.trim() === '')
@@ -23,10 +23,10 @@ Deno.test('Regression test for crashing bug on certain .i18n.ts files', async ()
   else
   {
     const y = await tryImportingCode({ sourceCode: strippedContents });
-    console.log(
-      'Importing stripped contents: ',
-      Deno.inspect(y, { depth: Infinity, colors: true }),
-    );
+    // console.log(
+    //   'Importing stripped contents: ',
+    //   Deno.inspect(y, { depth: Infinity, colors: true }),
+    // );
     assert(y.success, 'Importing stripped contents should work');
   }
 });

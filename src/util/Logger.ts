@@ -38,6 +38,24 @@ export class Logger
   private entries: LogEntry[] = [];
 
   /**
+   If either `Logger.useConsoleAlso` has been set to `true`, or environment variable `LOGGER_SHOULD_USE_CONSOLE_ALSO` is set to '1' or 'true',
+   `console.log()`, `console.warn()`, etc will also be called. This option exists for debugging.
+   */
+  static get useConsoleAlso()
+  {
+    return this._useConsoleAlso
+      || Deno.env.get('LOGGER_SHOULD_USE_CONSOLE_ALSO') === '1'
+      || Deno.env.get('LOGGER_SHOULD_USE_CONSOLE_ALSO') === 'true';
+  }
+
+  static set useConsoleAlso(value: boolean)
+  {
+    this._useConsoleAlso = value;
+  }
+
+  private static _useConsoleAlso = false;
+
+  /**
    Log a debug message
    */
   debug(category: LogCategory, message: string, data?: unknown): void
@@ -67,7 +85,6 @@ export class Logger
   error(category: LogCategory, message: string, data?: unknown): void
   {
     this.log('ERROR', category, message, data);
-    console.error(message, data);
   }
 
   /**
@@ -82,6 +99,26 @@ export class Logger
       message,
       data,
     });
+
+    if (Logger.useConsoleAlso)
+    {
+      if (level === 'ERROR')
+      {
+        console.error(message, data);
+      }
+      else if (level === 'WARN')
+      {
+        console.warn(message, data);
+      }
+      else if (level === 'INFO')
+      {
+        console.info(message, data);
+      }
+      else if (level === 'DEBUG')
+      {
+        console.debug(message, data);
+      }
+    }
   }
 
   /**

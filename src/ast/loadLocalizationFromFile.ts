@@ -61,7 +61,6 @@ export const loadLocalizationFromFileOrThrow = async (
   const filePath = path;
 
   const originalCode = await Deno.readTextFile(filePath);
-  // console.log({ originalCode });
 
   const code = await stripImports(originalCode);
   const strippedTmpFile = await Deno.makeTempFile({ suffix: '.ts' });
