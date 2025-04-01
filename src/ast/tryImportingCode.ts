@@ -58,7 +58,8 @@ export async function tryImportingCode(options: ImportOptions): Promise<ImportRe
 
     // Try importing the file
     const realPath = await Deno.realPath(tempFile);
-    const module = await import(`file://${realPath}`);
+    // const module = await import(`file://${realPath}`);
+    const module = await import(tempFile);
 
     // It worked! We're good.
     return {
