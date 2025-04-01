@@ -8,6 +8,7 @@
     "@axhxrx/dprint-config": "jsr:@axhxrx/dprint-config@^0.0.6",
     "@axhxrx/internationalization": "jsr:@axhxrx/internationalization@^0.0.9",
     "@dprint/formatter": "jsr:@dprint/formatter@^0.4.1",
+    "@std/assert": "jsr:@std/assert@^1.0.12",
     "@std/cli": "jsr:@std/cli@^1.0.14",
     "@std/fs": "jsr:@std/fs@^1.0.14",
     "@std/path": "jsr:@std/path@^1.0.8",
