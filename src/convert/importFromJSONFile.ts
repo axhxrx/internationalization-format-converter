@@ -1,7 +1,7 @@
-import { convertFromSimpleLocalizeFormat } from './convertFromSimpleLocalizeFormat.ts';
 import { getDifferencesOrThrow } from '../ast/getDifferencesOrThrow.ts';
-import { importFromJSON } from './importFromJSON.ts';
 import { logger } from '../util/Logger.ts';
+import { convertFromSimpleLocalizeFormat } from './convertFromSimpleLocalizeFormat.ts';
+import { importFromJSON } from './importFromJSON.ts';
 
 /**
  Import changes from a JSON file (that was exported via `exportToJSON()`) to a TypeScript file (in the format defined by `@axhxrx/internationalization`). This process updates the leaf nodes that are strings, if the JSON value is different from the existing value.

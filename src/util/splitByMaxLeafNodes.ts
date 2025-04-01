@@ -1,23 +1,23 @@
 import { countLeafNodes } from './countLeafNodes.ts';
 
 /**
- Takes an object and returns an array of one or more objects, which contain 
- the same set of top-level keys as `jsonObject`, but with a total of no more 
+ Takes an object and returns an array of one or more objects, which contain
+ the same set of top-level keys as `jsonObject`, but with a total of no more
  than `maxLeafNodes` leaf nodes in the entire object.
- 
+
  It does not split the nested objects up, it just splits the top-level keys.
  If a nested object has more than `maxLeafNodes` leaf nodes, it throws an error.
- 
- This method returns as many objects as necessary to ensure that no object 
+
+ This method returns as many objects as necessary to ensure that no object
  exceeds the `maxLeafNodes` limit.
- 
+
  @param jsonObject - The JSON object to split
  @param maxLeafNodes - The maximum number of leaf nodes allowed in each result object
  @returns An array of objects, each with no more than maxLeafNodes leaf nodes
  */
 export const splitByMaxLeafNodesOrThrow = (
   jsonObject: Record<string, unknown>,
-  maxLeafNodes: number
+  maxLeafNodes: number,
 ): Array<Record<string, unknown>> =>
 {
   // Get all entries from the input object

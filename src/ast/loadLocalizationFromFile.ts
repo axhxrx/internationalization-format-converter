@@ -22,7 +22,12 @@ type WhoKnows = Record<string, any>;
 export const loadLocalizationFileContentsOrThrow = async (
   sourceCode: string,
   rootLevelIdentifier?: string,
-) =>
+): Promise<{
+  module: WhoKnows;
+  originalCode: string;
+  code: string;
+  json: string;
+}> =>
 {
   const tmpFile = await Deno.makeTempFile({ suffix: '.ts' });
   await Deno.writeTextFile(tmpFile, sourceCode);

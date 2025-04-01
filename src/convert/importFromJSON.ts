@@ -1,5 +1,5 @@
-import { convertFromSimpleLocalizeFormat } from './convertFromSimpleLocalizeFormat.ts';
 import { getDifferencesOrThrow } from '../ast/getDifferencesOrThrow.ts';
+import { convertFromSimpleLocalizeFormat } from './convertFromSimpleLocalizeFormat.ts';
 import { importJSONOrThrow } from './importJSONOrThrow.ts';
 
 /**
@@ -13,7 +13,7 @@ export async function importFromJSON(
     showDiffs?: boolean;
     simpleLocalizeFormat?: boolean;
   } = {},
-)
+): Promise<string>
 {
   try
   {

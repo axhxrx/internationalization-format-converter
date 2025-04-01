@@ -16,5 +16,10 @@
   },
   "tasks": {
     "test": "deno test --allow-write --allow-read --allow-env --unstable-sloppy-imports test/*.test.ts"
+  },
+  "publish": {
+    "exclude": [
+      "test"
+    ]
   }
 }

@@ -1,6 +1,9 @@
 import { loadLocalizationFromFileOrThrow } from '../ast/loadLocalizationFromFile.ts';
 import { convertToSimpleLocalizeFormat } from './convertToSimpleLocalizeFormat.ts';
 
+// deno-lint-ignore no-explicit-any
+type WhoKnows = Record<string, any>;
+
 /**
  * Export a TypeScript-format localization to JSON without writing to disk.
  * Returns the result object containing JSON and other data.
@@ -13,7 +16,12 @@ export async function exportToJSON(
     printToStdout?: boolean;
     simpleLocalizeFormat?: boolean;
   } = {},
-)
+): Promise<{
+  module: WhoKnows;
+  originalCode: string;
+  code: string;
+  json: string;
+}>
 {
   let rootLevelIdentifier: string | { derive: true } | undefined;
 
