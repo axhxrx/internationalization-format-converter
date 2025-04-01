@@ -1,10 +1,10 @@
-import { isAbsolute, join } from '@std/path';
 import { isLocalization } from '@axhxrx/internationalization';
-import { convertFromSimpleLocalizeFormat } from '../convert/convertFromSimpleLocalizeFormat.ts';
+import { isAbsolute, join } from '@std/path';
 import { DiffResult } from '../ast/DiffResult.ts';
-import { importJSONOrThrow } from '../convert/importJSONOrThrow.ts';
 import { loadLocalizationFromFileOrThrow } from '../ast/loadLocalizationFromFile.ts';
 import type { SearchOptions } from '../cli/SearchOptions.ts';
+import { convertFromSimpleLocalizeFormat } from '../convert/convertFromSimpleLocalizeFormat.ts';
+import { importJSONOrThrow } from '../convert/importJSONOrThrow.ts';
 
 const defaultSearchOptions: SearchOptions = {
   fileExtensions: ['.json'],
@@ -74,11 +74,7 @@ export class BatchImport
 
     if (importOptions.simpleLocalizeFormat)
     {
-      const fixedPathMap: Record<string, Record<string, unknown>> = {};
-      for (const [key, value] of Object.entries(jsonPathMap))
-      {
-        fixedPathMap[key] = convertFromSimpleLocalizeFormat(value as Record<string, unknown>);
-      }
+      const fixedPathMap = convertFromSimpleLocalizeFormat(jsonPathMap);
       this.jsonPathMap = fixedPathMap;
     }
     else
