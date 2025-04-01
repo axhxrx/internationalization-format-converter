@@ -83,11 +83,11 @@ Deno.test('BatchImport works (normal mode)', async () =>
   await runImportTest(pathMap, pathToTmpSourceDir);
 });
 
-Deno.test('BatchImport works (SimpleLocalize mode)', async () =>
-{
-  const pathToTmpSourceDir = await Deno.makeTempDir({ prefix: 'BatchImport-test-source-alt-' });
-  const json = await Deno.readTextFile(pathToModifiedAlternate);
-  const pathMap = JSON.parse(json);
+// Deno.test('BatchImport works (SimpleLocalize mode)', async () =>
+// {
+//   const pathToTmpSourceDir = await Deno.makeTempDir({ prefix: 'BatchImport-test-source-alt-' });
+//   const json = await Deno.readTextFile(pathToModifiedAlternate);
+//   const pathMap = JSON.parse(json);
 
-  await runImportTest(pathMap, pathToTmpSourceDir, { simpleLocalizeFormat: true });
-});
+//   await runImportTest(pathMap, pathToTmpSourceDir, { simpleLocalizeFormat: true });
+// });

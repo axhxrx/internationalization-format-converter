@@ -121,8 +121,7 @@ export class BatchExport
   async run(): Promise<CompletedBatchExport | FailedBatchExport>
   {
     const entries = Object.entries(this.inputs)
-      .sort((a, b) => a[0].localeCompare(b[0])); // sort the paths
-
+      .sort((a, b) => a[0].localeCompare(b[0], 'en', { sensitivity: 'base' }));
     let leafNodesExported = 0;
 
     for (const [path, result] of entries)
