@@ -1,5 +1,7 @@
 # @axhxrx/internationalization-format-converter
 
+## WIP
+
 This library is a WIP hack for converting between TypeScript localization files (as defined by [@axhxrx/internationalization](https://jsr.io/@axhxrx/internationalization)) and JSON.
 
 It's still at the is-it-workable ideation stage, so you probably shouldn't use it yet. 
@@ -7,10 +9,6 @@ It's still at the is-it-workable ideation stage, so you probably shouldn't use i
 The purpose here is to be able to use the TypeScript format defined by [@axhxrx/internationalization](https://jsr.io/@axhxrx/internationalization), but automate integrations with other services, which generally only support JSON. This library can (at least sometimes) convert the `.ts` format to JSON, and then update the original `.ts` file with the changes from newer JSON files.
 
 If it proves workable, then this library will be further updated in the future. Until such time, here's some LLM spew about the current state of affairs:
-
-## Requires `--unstable-sloppy-imports` flag
-
-NOTE: Because this library uses Deno's capacity to import arbitrary files, it requires the `--unstable-sloppy-imports` flag if you want to use it with TypeScript files that don't use non-insane imports. (That is, if your imports within the TypeScript code omit the ".ts" file extension, as is still the prevailing practice in 2025 with Node.js projects).
 
 ----
 
@@ -82,6 +80,10 @@ await Deno.writeTextFile("path/to/file.i18n.ts", updatedTsCode);
 # Run tests
 deno test --allow-read --allow-write --allow-env --unstable-sloppy-imports
 ```
+
+## NOTE: Yoshimi & JSR vs the pink robots and dynamic imports
+
+I had intended to publish this on jsr.io, but after developing the initial WIP version on my local machine, I published it and immediately learned that [JSR.io doesn't support dynamic imports](https://github.com/denoland/deno/discussions/26266). It rewrites imports to be static, and JSR-package-relative, which means we can't dynamically import arbitrary .ts files using Deno. That's sad, since that is actually central to the purpose of this library. But, there's an intergalactic-time-vortex kludge that we can use instead — using the `typescript` NPM package to compile the TypeScript code to JS in memory, then wrap it in a `var exports = {}; /* ... */ exports;` sandwich, and then use `eval()` to execute the code and get the exported values. 😐
 
 ## License
 

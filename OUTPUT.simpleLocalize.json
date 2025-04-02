@@ -7104,6 +7104,18 @@
       }
     },
     "libs/i18n/ui-conversations/ui-conversations.i18n.ts": {
+      "queryIntelligence": {
+        "app": {
+          "title": "Quoracomm Query Intelligence",
+          "subtitle": "Ask questions about your data and get structured data insights."
+        }
+      },
+      "support": {
+        "app": {
+          "title": "Quoracomm Support Bot",
+          "subtitle": "Get answers on using the Quoracomm platform and services."
+        }
+      },
       "base": {
         "tab": {
           "chat": "Chat",
@@ -7155,18 +7167,6 @@
           "pleaseAskANewQuestionOrTryAgainLater": "Please try a different question, or try again later",
           "isAvailableWhenYouAreLoggedIn": " is available when you are logged in with your Quoracomm account.",
           "unknown": "An unexpected error has occurred. Sorry for any inconvenience."
-        }
-      },
-      "queryIntelligence": {
-        "app": {
-          "title": "Quoracomm Query Intelligence",
-          "subtitle": "Ask questions about your data and get structured data insights."
-        }
-      },
-      "support": {
-        "app": {
-          "title": "Quoracomm Support Bot",
-          "subtitle": "Get answers on using the Quoracomm platform and services."
         }
       }
     },
@@ -9749,10 +9749,6 @@
       }
     },
     "libs/i18n/common/common.i18n.ts": {
-      "ErrorMessagesI18n": {
-        "blockedByClientFilter": "Request blocked by client. Please check the configuration of any web filters and/or ad blockers.",
-        "unknownError": "An unexpected error has occurred. Sorry for any inconvenience."
-      },
       "bundles": "Bundles",
       "cancel": "Cancel",
       "color": "Color",
@@ -9774,7 +9770,11 @@
       "speedClass": "Speed class",
       "status": "Status",
       "subscription": "Subscription",
-      "trustPolicy": "Trust policy"
+      "trustPolicy": "Trust policy",
+      "ErrorMessagesI18n": {
+        "blockedByClientFilter": "Request blocked by client. Please check the configuration of any web filters and/or ad blockers.",
+        "unknownError": "An unexpected error has occurred. Sorry for any inconvenience."
+      }
     },
     "libs/i18n/component/user-console/src/lib/user-console-individual-translation-sheets/datetime.i18n.ts": {
       "translations": {
@@ -20716,6 +20716,18 @@
       }
     },
     "libs/i18n/ui-conversations/ui-conversations.i18n.ts": {
+      "queryIntelligence": {
+        "app": {
+          "title": "QUORACOMM Query Intelligence",
+          "subtitle": "質問に応じて、データを集計します。"
+        }
+      },
+      "support": {
+        "app": {
+          "title": "QUORACOMM Support Bot",
+          "subtitle": "QUORACOMM サービスの仕様や使用方法に関する質問に AI が回答します。"
+        }
+      },
       "base": {
         "tab": {
           "chat": "会話",
@@ -20767,18 +20779,6 @@
           "pleaseAskANewQuestionOrTryAgainLater": "別の質問を試してみてください。",
           "isAvailableWhenYouAreLoggedIn": " を利用するには QUORACOMM アカウントでログインしてください。",
           "unknown": "エラーが発生しました。ご不便をおかけし申し訳ございません。"
-        }
-      },
-      "queryIntelligence": {
-        "app": {
-          "title": "QUORACOMM Query Intelligence",
-          "subtitle": "質問に応じて、データを集計します。"
-        }
-      },
-      "support": {
-        "app": {
-          "title": "QUORACOMM Support Bot",
-          "subtitle": "QUORACOMM サービスの仕様や使用方法に関する質問に AI が回答します。"
         }
       }
     },
@@ -23361,10 +23361,6 @@
       }
     },
     "libs/i18n/common/common.i18n.ts": {
-      "ErrorMessagesI18n": {
-        "blockedByClientFilter": "リクエストが遮断されました。広告ブロッカーなどの WEB フィルターの設定をご確認ください。",
-        "unknownError": "エラーが発生しました。ご不便をおかけし申し訳ございません。"
-      },
       "bundles": "バンドル",
       "cancel": "キャンセル",
       "color": "色",
@@ -23386,7 +23382,11 @@
       "speedClass": "速度クラス",
       "status": "ステータス",
       "subscription": "サブスクリプション",
-      "trustPolicy": "信頼ポリシー"
+      "trustPolicy": "信頼ポリシー",
+      "ErrorMessagesI18n": {
+        "blockedByClientFilter": "リクエストが遮断されました。広告ブロッカーなどの WEB フィルターの設定をご確認ください。",
+        "unknownError": "エラーが発生しました。ご不便をおかけし申し訳ございません。"
+      }
     },
     "libs/i18n/component/user-console/src/lib/user-console-individual-translation-sheets/datetime.i18n.ts": {
       "translations": {

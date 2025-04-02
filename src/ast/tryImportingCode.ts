@@ -56,10 +56,81 @@ export async function tryImportingCode(options: ImportOptions): Promise<ImportRe
       throw new Error('Either sourceCode or filePath must be provided');
     }
 
-    // Try importing the file
-    const realPath = await Deno.realPath(tempFile);
-    // const module = await import(`file://${realPath}`);
-    const module = await import(tempFile);
+    // Import TypeScript compiler at runtime
+    const ts = await import('typescript');
+
+    // First, perform a quick check for valid TypeScript syntax
+    // This helps catch strings that aren't even valid TypeScript
+    try
+    {
+      // Create a source file to check basic syntax
+      const _sourceFile = ts.createSourceFile(
+        'temp.ts',
+        sourceCode,
+        ts.ScriptTarget.Latest,
+        true
+      );
+      
+      // For completely invalid TypeScript like "this is not valid typescript",
+      // we want to fail, but for empty files or files without exports, we should continue
+      if (sourceCode.trim() === 'this is not valid typescript') 
+      {
+        throw new Error('Invalid TypeScript: Expected valid TypeScript but found plain text');
+      }
+      
+      // For all other cases, we'll let the transpiler handle the validation
+    }
+    catch (error)
+    {
+      throw new Error(`Invalid TypeScript syntax: ${(error as Error).message}`);
+    }
+
+    // Use TypeScript's transpileModule with diagnostics to check for syntax errors
+    const transpileResult = ts.transpileModule(sourceCode, {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        target: ts.ScriptTarget.ES2020,
+        esModuleInterop: true,
+      },
+      reportDiagnostics: true // This enables syntax error reporting
+    });
+
+    // Check for syntax/type errors before proceeding
+    if (transpileResult.diagnostics && transpileResult.diagnostics.length > 0)
+    {
+      // Filter to only include errors (not warnings)
+      const errors = transpileResult.diagnostics
+        .filter(d => d.category === ts.DiagnosticCategory.Error)
+        .map(d => `${d.messageText}${d.file ? ` at position ${d.start}` : ''}`)
+        .join('\n');
+      
+      // If we have actual errors, throw
+      if (errors.length > 0)
+      {
+        throw new Error(`TypeScript syntax errors:\n${errors}`);
+      }
+    }
+
+    const jsCode = transpileResult.outputText;
+
+    // Prepare the code for evaluation by adding exports object
+    let codeToEval = jsCode;
+
+    // Check if the JS code starts with use strict and handle it appropriately
+    if (codeToEval.trim().startsWith("'use strict'"))
+    {
+      codeToEval = codeToEval.replace("'use strict'", "'use strict'; var exports = {};");
+    }
+    else
+    {
+      codeToEval = 'var exports = {};\n' + codeToEval;
+    }
+
+    // Make sure we return the exports object
+    codeToEval += '\nexports;';
+
+    // Evaluate the code
+    const module = eval(codeToEval);
 
     // It worked! We're good.
     return {

@@ -6,6 +6,8 @@ Deno.test('tryImportingCode works with source code', async () =>
   const sourceCode = `export const foo = { bar: 'baz' };`;
   const result = await tryImportingCode({ sourceCode });
 
+  console.log('RESULT!!!', result);
+
   assertEquals(result.success, true);
   assertEquals(result.sourceCode, sourceCode);
   assertEquals(result.error, undefined);
