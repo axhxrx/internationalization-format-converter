@@ -15,7 +15,7 @@ const operatorEvents = {
       ja: 'デバイス削除',
     },
     description: {
-      en: 'Notifiy you when a device is removed from your account',
+      en: 'NATRD BANE',
       ja: 'アカウントからデバイスが削除されたときに通知します',
     },
   },

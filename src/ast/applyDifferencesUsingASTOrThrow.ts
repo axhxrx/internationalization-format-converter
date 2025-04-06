@@ -75,8 +75,55 @@ function findAndModify(
 
   if (!property)
   {
-    throw new Error(`Path not found in code: ${currentKey}`);
+    // Key not found directly, check for SpreadAssignments
+    let modifiedInSpread = false;
+    for (const child of objectLiteral.getChildrenOfKind(SyntaxKind.SpreadAssignment))
+    {
+      const spreadExpr = child.getExpression();
+      // We expect the spread expression to be an identifier referencing a known local declaration
+      if (spreadExpr.getKind() === SyntaxKind.Identifier)
+      {
+        const identifierName = spreadExpr.getText();
+        const localValue = localDeclarations.get(identifierName);
+        if (localValue)
+        {
+          // Try to find and modify within the spread source object.
+          // IMPORTANT: Pass the original 'path', not 'remainingPath', because the currentKey
+          // is expected to be a property within the spread source object.
+          if (findAndModify(localValue, path, newValue, localDeclarations))
+          {
+            modifiedInSpread = true;
+            break; // Found and modified, stop searching other spreads
+          }
+        }
+        else
+        {
+          // This might indicate an issue if a spread identifier isn't resolvable,
+          // but we'll allow the search to continue in other spreads or properties.
+          console.warn(`Spread identifier '${identifierName}' not found in local declarations.`);
+        }
+      }
+      else
+      {
+        // Log if the spread expression isn't a simple identifier, as we don't handle complex spreads yet.
+        console.warn(`Spread assignment expression is not an identifier: ${SyntaxKind[spreadExpr.getKind()]}`);
+      }
+    }
+
+    if (modifiedInSpread)
+    {
+      return true; // Modification was successful within a spread assignment
+    }
+
+    // If not found in direct properties or any spread assignments, then it's truly not found.
+    throw new Error(
+      `Property '${currentKey}' not found in object literal or its spread assignments. Path: ${path.join(
+        '.',
+      )}. Object text: ${objectLiteral.getText().substring(0, 100)}...`, // Added object text for context
+    );
   }
+
+  // --- Property *was* found directly ---
 
   // Get the kind of the property for debugging reference. But, need to use asKind() to access the properties in a type-aware
   const kindName = property.getKindName();
@@ -147,6 +194,12 @@ function findAndModify(
   }
   else if (unwrappedInitializer && unwrappedInitializer.asKind(SyntaxKind.ObjectLiteralExpression))
   {
+    // @masonmark 2025-04-06: LE PROBLEME:
+    // export const soraCamNotificationI18n = {
+    //   eventTypes: {
+    //     ...operatorEvents,
+    //     ...deviceEvents,
+    //   },
     return findAndModify(
       unwrappedInitializer as ObjectLiteralExpression,
       remainingPath,

@@ -26,7 +26,10 @@ Deno.test('Regression test 2025-04-03', async () =>
   const copyOfFixture = join(pathToEnclosingDir, 'test', 'fixtures', 'regression-2025-04-03.copy.i18n.ts');
   await Deno.copyFile(pathToFixture, copyOfFixture);
 
-  const text = JSON.stringify(json, null, 2);
+  let text = JSON.stringify(json, null, 2);
+
+  text = text.replace('Notifiy you when a device is removed from your account', 
+    'NATRD BANE');
 
   console.log(text);
 
