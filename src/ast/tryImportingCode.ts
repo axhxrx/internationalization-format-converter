@@ -1,3 +1,5 @@
+import * as ts from 'typescript';
+
 type ImportOptionsWithSource = {
   sourceCode: string;
   filePath?: never;
@@ -31,6 +33,7 @@ export async function tryImportingCode(options: ImportOptions): Promise<ImportRe
 {
   let sourceCode: string = 'ERROR: sourceCode could not be read, probably due to an error during or before read';
   let tempFile: string | undefined;
+  let transpileResult: ts.TranspileOutput;
 
   try
   {
@@ -56,8 +59,13 @@ export async function tryImportingCode(options: ImportOptions): Promise<ImportRe
       throw new Error('Either sourceCode or filePath must be provided');
     }
 
+    // 😐 THE GREAT DYNAMIC IMPORTS DEBACLE OF 2025
+    //
+    // The code below is a fairly ludicrous hack, but see the README for why we need it.
+    // It used to be just a simple `dynamic import(randomI18nFile)` but that doesn't work
+    // with JSR.io — even if you install the package locally. See the README for details.
+
     // Import TypeScript compiler at runtime
-    const ts = await import('typescript');
 
     // First, perform a quick check for valid TypeScript syntax
     // This helps catch strings that aren't even valid TypeScript
@@ -68,48 +76,65 @@ export async function tryImportingCode(options: ImportOptions): Promise<ImportRe
         'temp.ts',
         sourceCode,
         ts.ScriptTarget.Latest,
-        true
+        true,
       );
-      
-      // For completely invalid TypeScript like "this is not valid typescript",
-      // we want to fail, but for empty files or files without exports, we should continue
-      if (sourceCode.trim() === 'this is not valid typescript') 
-      {
-        throw new Error('Invalid TypeScript: Expected valid TypeScript but found plain text');
-      }
-      
-      // For all other cases, we'll let the transpiler handle the validation
+
+      transpileResult = ts.transpileModule(sourceCode, {
+        compilerOptions: {
+          module: ts.ModuleKind.CommonJS,
+          target: ts.ScriptTarget.ES2020,
+          esModuleInterop: true,
+        },
+        reportDiagnostics: false, // This controls syntax error reporting
+      });
     }
     catch (error)
     {
       throw new Error(`Invalid TypeScript syntax: ${(error as Error).message}`);
     }
 
-    // Use TypeScript's transpileModule with diagnostics to check for syntax errors
-    const transpileResult = ts.transpileModule(sourceCode, {
-      compilerOptions: {
-        module: ts.ModuleKind.CommonJS,
-        target: ts.ScriptTarget.ES2020,
-        esModuleInterop: true,
-      },
-      reportDiagnostics: true // This enables syntax error reporting
-    });
+    // Create a simple program to get diagnostics
+    // const tsOpts = ts.getDefaultCompilerOptions();
 
-    // Check for syntax/type errors before proceeding
-    if (transpileResult.diagnostics && transpileResult.diagnostics.length > 0)
-    {
-      // Filter to only include errors (not warnings)
-      const errors = transpileResult.diagnostics
-        .filter(d => d.category === ts.DiagnosticCategory.Error)
-        .map(d => `${d.messageText}${d.file ? ` at position ${d.start}` : ''}`)
-        .join('\n');
-      
-      // If we have actual errors, throw
-      if (errors.length > 0)
-      {
-        throw new Error(`TypeScript syntax errors:\n${errors}`);
-      }
-    }
+    // Create a program that can check syntax
+    // const host = ts.createCompilerHost(tsOpts);
+    // const program = ts.createProgram([tempFile], tsOpts, host);
+
+    // // Get pre-emit diagnostics (syntax and semantic errors)
+    // const diagnostics = ts.getPreEmitDiagnostics(program);
+
+    // // If there are syntax errors, return failure
+    // if (diagnostics.length > 0)
+    // {
+    //   const errors = diagnostics.map(d => `${d.messageText}${d.file ? ` at position ${d.start}` : ''}`).join('\n');
+
+    //   throw new Error(`TypeScript syntax errors:\n${errors}`);
+    // }
+    // // Use TypeScript's transpileModule with diagnostics to check for syntax errors
+    // const transpileResult = ts.transpileModule(sourceCode, {
+    //   compilerOptions: {
+    //     module: ts.ModuleKind.CommonJS,
+    //     target: ts.ScriptTarget.ES2020,
+    //     esModuleInterop: true,
+    //   },
+    //   reportDiagnostics: true, // This enables syntax error reporting
+    // });
+
+    // // Check for syntax/type errors before proceeding
+    // if (transpileResult.diagnostics && transpileResult.diagnostics.length > 0)
+    // {
+    //   // Filter to only include errors (not warnings)
+    //   const errors = transpileResult.diagnostics
+    //     .filter(d => d.category === ts.DiagnosticCategory.Error)
+    //     .map(d => `${d.messageText}${d.file ? ` at position ${d.start}` : ''}`)
+    //     .join('\n');
+
+    //   // If we have actual errors, throw
+    //   if (errors.length > 0)
+    //   {
+    //     throw new Error(`TypeScript syntax errors:\n${errors}`);
+    //   }
+    // }
 
     const jsCode = transpileResult.outputText;
 

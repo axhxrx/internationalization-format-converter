@@ -22,7 +22,7 @@
     },
     {
       "request": "launch",
-      "name": "Debug tests",
+      "name": "Debug frontmost test",
       "type": "node",
       "program": "${fileDirname}/${fileBasename}",
       "cwd": "${workspaceFolder}",
@@ -41,7 +41,8 @@
         // "test/fromJSONFiles.test.ts"
         // "test/bug006.test.ts"
         // "test/BatchImport.test.ts",
-        "test/BatchExport.test2.ts"
+        // "test/BatchExport.test2.ts"
+        "${fileDirname}/${fileBasename}"
       ],
       "attachSimplePort": 9229
     },

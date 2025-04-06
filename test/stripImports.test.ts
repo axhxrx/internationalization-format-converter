@@ -74,3 +74,16 @@ Deno.test('stripImports with re-exported translation definitions produces import
     + `Source code:\n${result.sourceCode}\n`
     + `Error: ${result.error?.message ?? 'unknown error'}`);
 });
+
+Deno.test('stripImports regression test ', async () =>
+{
+  const modulePath = pathToFixtures
+    + 'collection/libs/apps/user-console/quux-page/src/lib/ui-action-def/quux-action.i18n.ts';
+  const fileContents = await Deno.readTextFile(modulePath);
+  const strippedContents = await stripImports(fileContents);
+
+  const result = await tryImportingCode({ sourceCode: strippedContents });
+  assert(result.success, `Failed to generate valid code when stripping ${modulePath}.\n`
+    + `Source code:\n${result.sourceCode}\n`
+    + `Error: ${result.error?.message ?? 'unknown error'}`);
+});

@@ -81,6 +81,12 @@ function removeImportsAndUsages(sourceFile: ts.SourceFile): ts.SourceFile
           return undefined;
         }
 
+        // Remove type alias declarations
+        if (ts.isTypeAliasDeclaration(node))
+        {
+          return undefined;
+        }
+
         // Remove export declarations (e.g., export * from 'module')
         if (ts.isExportDeclaration(node))
         {
@@ -169,6 +175,7 @@ function removeImportsAndUsages(sourceFile: ts.SourceFile): ts.SourceFile
           return node;
         }
 
+        // console.log(node, node.kind, ts.SyntaxKind[node.kind], node.getText(), (node as any).name?.text);
         return ts.visitEachChild(node, visit, context);
       }
 
@@ -223,38 +230,123 @@ export const stripImports = async (sourceCode: string): Promise<string> =>
   // For files that contain spreads that reference imports (which will be undefined after our transform),
   // we'll need a more aggressive approach - especially for complex files like master translation files
 
-  // First detect if the file has spread syntax
-  if (invalidSpreadRegex.test(unformattedResult))
-  {
-    // If we have an object that's mostly or all made up of spreads from imported variables,
-    // just return an empty string rather than try to salvage parts
-    // Check for complex spread pattern in an export object
-    const exportWithSpreadsRegex = /export\s+const\s+\w+\s*=\s*\{[\s\S]*?\.\.\.\w+[\s\S]*?\}/;
-    if (exportWithSpreadsRegex.test(unformattedResult))
-    {
-      return '';
-    }
-  }
+  // // First detect if the file has spread syntax
+  // if (invalidSpreadRegex.test(unformattedResult))
+  // {
+  //   console.log('WOMP! WOMP! WOMP!', unformattedResult);
+  //   // If we have an object that's mostly or all made up of spreads from imported variables,
+  //   // just return an empty string rather than try to salvage parts
+  //   // Check for complex spread pattern in an export object
+  //   const exportWithSpreadsRegex = /export\s+const\s+\w+\s*=\s*\{[\s\S]*?\.\.\.\w+[\s\S]*?\}/;
+  //   if (exportWithSpreadsRegex.test(unformattedResult))
+  //   {
+  //     return '';
+  //   }
+  // }
 
-  // Check if we need to remove invalid exports
-  if (invalidExportRegex.test(unformattedResult)
-    || invalidSpreadRegex.test(unformattedResult)
-    || objectWithOnlySpreadsRegex.test(unformattedResult))
-  {
-    // First, try to remove entire objects that only contain spreads
-    unformattedResult = unformattedResult.replace(objectWithOnlySpreadsRegex, '');
+  // // Check if we need to remove invalid exports
+  // if (invalidExportRegex.test(unformattedResult)
+  //   || invalidSpreadRegex.test(unformattedResult)
+  //   || objectWithOnlySpreadsRegex.test(unformattedResult))
+  // {
+  //   // First, try to remove entire objects that only contain spreads
+  //   unformattedResult = unformattedResult.replace(objectWithOnlySpreadsRegex, '');
 
-    // Then remove any remaining simple invalid exports
-    unformattedResult = unformattedResult.replace(invalidExportRegex, '');
+  //   // Then remove any remaining simple invalid exports
+  //   unformattedResult = unformattedResult.replace(invalidExportRegex, '');
 
-    // If the file is now empty or only contains whitespace, return empty string
-    if (!unformattedResult.trim())
-    {
-      return '';
-    }
-  }
+  //   // If the file is now empty or only contains whitespace, return empty string
+  //   if (!unformattedResult.trim())
+  //   {
+  //     return '';
+  //   }
+  // }
 
   const result = await formatTypeScriptCode(unformattedResult);
 
   return result;
 };
+
+// const src = `
+// import { Localization as I18nItem } from '@axhxrx/internationalization';
+
+// /**
+//  The type defining the locales that Quoracomm supports in its frontend apps.
+//  */
+// export type DEFAULT_LOCALES = 'en' | 'ja';
+
+// export type I18nItemDefault = I18nItem<DEFAULT_LOCALES>;
+
+// import { UISupportedQuuxActionType } from './ui-supported-quux-action';
+
+// export const QuuxActionI18n = {
+//   'object-detection': {
+//     label: { en: 'Simple object detection', ja: '簡易物体検出' },
+//     description: {
+//       en: 'Apply simple object detection to an image from a URL.',
+//       ja: '指定した URL の画像に対して、人、車など限られた種類の物体の数を検知します',
+//     },
+//   },
+//   webhook: {
+//     label: { en: 'Webhook', ja: 'Webhook' },
+//     description: {
+//       en: 'Send data to a webhook',
+//       ja: 'データを Webhook に送信します',
+//     },
+//   },
+//   ai: {
+//     label: { en: 'AI', ja: 'AI' },
+//     description: {
+//       en: 'Send a request to a GenAI model',
+//       ja: '生成 AI にリクエストを送信します',
+//     },
+//   },
+//   'slack-notification': {
+//     label: { en: 'Slack Notification', ja: 'Slack 通知' },
+//     description: {
+//       en: 'Send data to Slack',
+//       ja: 'データを Slack に送信します',
+//     },
+//   },
+//   'line-notification': {
+//     label: { en: 'LINE Notification', ja: 'LINE 通知' },
+//     description: {
+//       en: 'Send data to LINE',
+//       ja: 'データを LINE に送信します',
+//     },
+//   },
+//   'email-notification': {
+//     label: { en: 'Email Notification', ja: 'Email 通知' },
+//     description: { en: 'Send Email', ja: 'データを Email 送信します' },
+//   },
+//   republish: {
+//     label: { en: 'Republish', ja: 'Republish' },
+//     description: {
+//       en: 'Transform the data and republish it to another channel',
+//       ja: 'データを変換し、別のチャネルに再送信します',
+//     },
+//   },
+//   'quoracomm-api': {
+//     label: { en: 'Quoracomm API', ja: 'QUORACOMM API' },
+//     description: {
+//       en: 'Invoke QUORACOMM API',
+//       ja: 'QUORACOMM API を実行します',
+//     },
+//   },
+//   weathernews: {
+//     label: { en: 'Weather Forecast', ja: 'Weather Forecast' },
+//     description: {
+//       en:
+//         'Utilize pinpoint weather forecast data provided by <a href="https://global.weathernews.com/" target="_blank">WeatherNews</a> with 1km mesh accuracy.',
+//       ja:
+//         '<a href="https://jp.weathernews.com/" target="_blank">WeatherNews</a> 社提供による、指定した緯度経度地点の 1km メッシュピンポイント天気予報のデータが利用できます',
+//     },
+//   },
+// } as const satisfies Record<
+//   UISupportedQuuxActionType,
+//   { label: I18nItemDefault; description: I18nItemDefault }
+// >;
+// `;
+
+// const x = await stripImports(src);
+// console.log(x);

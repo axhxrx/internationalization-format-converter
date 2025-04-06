@@ -124,10 +124,12 @@ export class BatchExport
       .sort((a, b) => a[0].localeCompare(b[0], 'en', { sensitivity: 'base' }));
     let leafNodesExported = 0;
 
+    let i = 0;
     for (const [path, result] of entries)
     {
       try
       {
+        console.log(`Exporting ${++i} of ${entries.length}: ${path}`);
         logger.debug('BATCH', `${path}: BEGIN`);
         result.state = 'in progress';
 
@@ -227,6 +229,9 @@ export class BatchExport
         await Deno.writeTextFile(this.exportOptions.outputFile, json);
       }
     }
+
+    console.log('Successfully exported JSON for', this.successCount, 'files');
+    console.log(this);
 
     return error
       ? { ...this, state: 'error', error }

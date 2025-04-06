@@ -89,9 +89,12 @@ export class BatchImport
     rootPath?: string,
   ): Promise<CompletedBatchImport | FailedBatchImport>
   {
+    let i = 0;
     const paths = Object.keys(this.jsonPathMap);
     for (const possiblyRelativePath of paths)
     {
+      console.log('Importing', ++i, 'of', paths.length, ':', possiblyRelativePath);
+
       logger.debug('BATCH', 'Processing path:', possiblyRelativePath);
       logger.debug('BATCH', 'Root path:', rootPath);
 
