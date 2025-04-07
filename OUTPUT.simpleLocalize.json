@@ -9856,6 +9856,55 @@
         }
       }
     },
+    "apps/user-console/src/app/quora-kamm/notification-configurations/quora-kamm-notification.i18n.ts": {
+      "quoraCamNotificationI18n": {
+        "eventTypes": {
+          "deviceAdded": {
+            "label": "Device Added",
+            "description": "Notifiy you when a device is added to your account"
+          },
+          "deviceRemoved": {
+            "label": "Device Removed",
+            "description": "Notifiy you when a device is removed from your account"
+          },
+          "deviceShareStatusChanged": {
+            "label": "Device share status changed",
+            "description": "Notifiy you when a device is shared or unshared from another account."
+          },
+          "motionDetected": {
+            "label": "Motion Detected",
+            "description": "Notify you when a device detects motion"
+          },
+          "soundDetected": {
+            "label": "Sound Detected",
+            "description": "Notify you when a device detects sound"
+          },
+          "devicePropertyChanged": {
+            "label": "Device Property Changed",
+            "description": "Notifiy you when properties of a device changes"
+          },
+          "connected": {
+            "label": "Device Connected",
+            "description": "Notifiy you when a device is connected to the network"
+          },
+          "disconnected": {
+            "label": "Device Disconnected",
+            "description": "Notifiy you when a device gets disconnected from the network"
+          },
+          "eventRecordingStarted": {
+            "label": "Event Detected",
+            "description": "Notifiy you when an event recording started"
+          },
+          "cloudRecordingInterrupted": {
+            "label": "Cloud Recording Interrrupted",
+            "description": "Notifiy you when cloud recording is interrupted"
+          }
+        },
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "noDestinations": "(No destinations)"
+      }
+    },
     "libs/i18n/component/user-console/src/lib/user-console-individual-translation-sheets/register-credentials.i18n.ts": {
       "translations": {
         "registerCredentials": {
@@ -23466,6 +23515,55 @@
             "some": "イベントを削除しましたが、{{ count }} 個のイベントがエラーによって削除できませんでした。"
           }
         }
+      }
+    },
+    "apps/user-console/src/app/quora-kamm/notification-configurations/quora-kamm-notification.i18n.ts": {
+      "quoraCamNotificationI18n": {
+        "eventTypes": {
+          "deviceAdded": {
+            "label": "デバイス追加",
+            "description": "アカウントに新しくデバイスが追加されたときに通知します"
+          },
+          "deviceRemoved": {
+            "label": "デバイス削除",
+            "description": "アカウントからデバイスが削除されたときに通知します"
+          },
+          "deviceShareStatusChanged": {
+            "label": "デバイス共有",
+            "description": "ほかのアカウントにデバイスを共有したり共有が解除されたとき、または、ほかのアカウントからデバイスが共有されたり共有が解除されたときに通知します"
+          },
+          "motionDetected": {
+            "label": "モーション検知",
+            "description": "デバイスがモーションを検知したときに通知します"
+          },
+          "soundDetected": {
+            "label": "サウンド検知",
+            "description": "デバイスがサウンドを検知したときに通知します"
+          },
+          "devicePropertyChanged": {
+            "label": "デバイスの設定変更",
+            "description": "デバイスの設定が変更されたときに通知します"
+          },
+          "connected": {
+            "label": "デバイス接続",
+            "description": "デバイスがネットワークに接続されたときに通知します"
+          },
+          "disconnected": {
+            "label": "デバイス接続切断",
+            "description": "デバイスがネットワークから切断されたときに通知します"
+          },
+          "eventRecordingStarted": {
+            "label": "イベント検出",
+            "description": "デバイスがイベントを開始した際に通知します"
+          },
+          "cloudRecordingInterrupted": {
+            "label": "クラウド録画停止",
+            "description": "クラウド録画が停止した際に通知します"
+          }
+        },
+        "enabled": "有効",
+        "disabled": "無効",
+        "noDestinations": "(宛先なし)"
       }
     },
     "libs/i18n/component/user-console/src/lib/user-console-individual-translation-sheets/register-credentials.i18n.ts": {

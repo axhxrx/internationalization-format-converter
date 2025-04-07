@@ -75,7 +75,7 @@ export const loadLocalizationFromFileOrThrow = async (
     throw new Error(`Failed to import file ${filePath}: ${importResult.error?.message ?? 'unknown error'}`);
   }
 
-  if (!isLocalization(importResult.module))
+  if (!loadedModuleIsAcceptable(importResult.module))
   {
     console.error(`loadLocalizationFromFile: Invalid i18n structure: ${filePath}`, JSON.stringify(importResult.module));
     throw new Error(`loadLocalizationFromFile: Invalid i18n structure`);
@@ -90,7 +90,7 @@ export const loadLocalizationFromFileOrThrow = async (
     throw new Error(`Failed to reimport file ${strippedTmpFile}: ${reimportResult.error?.message ?? 'unknown error'}`);
   }
 
-  if (!isLocalization(reimportResult.module))
+  if (!loadedModuleIsAcceptable(reimportResult.module))
   {
     throw new Error(
       `loadLocalizationFromFile(): Failed to reimport file ${strippedTmpFile}: the imported code is not a valid Localization module`,
@@ -117,7 +117,7 @@ export const loadLocalizationFromFileOrThrow = async (
 
   const json = JSON.stringify(module, null, 2);
 
-  if (!isLocalization(module))
+  if (!loadedModuleIsAcceptable(module))
   {
     throw new Error(
       'loadLocalizationFromFile(): The derived result is not a valid Localization module: invalid i18n structure\n\n',
@@ -126,3 +126,29 @@ export const loadLocalizationFromFileOrThrow = async (
   }
   return { module, originalCode, code, json };
 };
+
+/**
+ Returns true if `isLocalization()` returns true **or** if the module is an empty object (which for our purposes means "empty localization")
+ */
+export function loadedModuleIsAcceptable(module: unknown): module is Localization<string>
+{
+  const _isLocalization = isLocalization(module);
+  if (_isLocalization)
+  {
+    return true;
+  }
+  if (typeof module !== 'object' || module === null)
+  {
+    return false;
+  }
+  let json: string | undefined;
+  try
+  {
+    json = JSON.stringify(module, null, 2);
+  }
+  catch (_error)
+  {
+    return false;
+  }
+  return json === '{}';
+}

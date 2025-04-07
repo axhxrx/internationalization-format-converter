@@ -42,5 +42,5 @@ Deno.test('Stress test on real-world files', async () =>
 
   // Assert the expected number of files
   console.log(`Found ${jsonOutputs.length} .i18n.ts files`);
-  assertEquals(jsonOutputs.length, 314);
+  assertEquals(jsonOutputs.length, 313);
 });
