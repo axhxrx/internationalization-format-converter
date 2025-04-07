@@ -88,3 +88,7 @@ I had intended to publish this on jsr.io, but after developing the initial WIP v
 ## License
 
 MIT
+
+## Happenings
+
+2025-04-07: Published version 0.0.5, still rough but usable in some cases
