@@ -1,6 +1,6 @@
-import { assertEquals } from 'jsr:@std/assert';
-import { walk } from 'jsr:@std/fs';
-import { join } from 'jsr:@std/path';
+import { assertEquals } from '@std/assert';
+import { walk } from '@std/fs';
+import { join } from '@std/path';
 
 import { loadLocalizationFromFileOrThrow } from '../src/ast/loadLocalizationFromFile.ts';
 const pathToFixtures = new URL('./fixtures/', import.meta.url).pathname;

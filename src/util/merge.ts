@@ -1,5 +1,5 @@
 import { assertNever } from '@axhxrx/assert-never';
-import { equal } from 'jsr:@std/assert';
+import { equal } from '@std/assert';
 
 type DeepMerge<T, U> = T extends object ? U extends object ? {
       [K in keyof T | keyof U]: K extends keyof U ? U[K] extends object ? K extends keyof T ? DeepMerge<T[K], U[K]>

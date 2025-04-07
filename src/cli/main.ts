@@ -69,6 +69,10 @@ export async function main(testArgs?: string | string[], useCwd?: string): Promi
 
   const command = args._[0] as string;
 
+  // These will be printed in help message on conclusion, if appropriate:
+  let rootDir: string | undefined;
+  let outputFile: string | undefined;
+
   if (args.help || !command || !['export', 'import', 'help', 'batch-export', 'batch-import'].includes(command))
   {
     printHelp();
@@ -125,8 +129,8 @@ export async function main(testArgs?: string | string[], useCwd?: string): Promi
 
     case 'batch-export':
     {
-      const rootDir = args._[1] as string;
-      const outputFile = args._[2] as string;
+      rootDir = args._[1] as string;
+      outputFile = args._[2] as string;
 
       if (!rootDir || !outputFile)
       {
@@ -187,7 +191,8 @@ export async function main(testArgs?: string | string[], useCwd?: string): Promi
   }
   else
   {
-    console.log('✅ Success. Exit status:', exitStatus);
+    const outputFileMessage = outputFile ? ` | Output file: ${outputFile}` : '';
+    console.log('✅ Success. Exit status:', exitStatus, outputFileMessage);
   }
 
   return exitStatus;

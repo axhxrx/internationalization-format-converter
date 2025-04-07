@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert';
+import { assertEquals } from '@std/assert';
 import { type LogEntry, Logger } from '../src/util/Logger.ts';
 
 Deno.test('Logger creates and filters entries by category', () =>

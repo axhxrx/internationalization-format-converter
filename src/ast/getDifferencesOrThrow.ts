@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { isLocalization, isLocalizedUnit, type Localization } from '@axhxrx/internationalization';
+import { convertFromSimpleLocalizeFormat } from '../convert/convertFromSimpleLocalizeFormat.ts';
 import logger from '../util/Logger.ts';
 import type { DiffResult } from './DiffResult.ts';
 import { loadLocalizationFileContentsOrThrow } from './loadLocalizationFromFile.ts';
@@ -9,7 +10,7 @@ import { stripImports } from './stripImports.ts';
 /**
  Primitive object diff method.
  */
-function diffObjects(
+export function diffObjects(
   obj1: Localization<string>,
   obj2: Localization<string>,
 ): DiffResult

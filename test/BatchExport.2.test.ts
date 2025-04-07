@@ -1,6 +1,6 @@
+import { assertEquals } from '@std/assert';
 import { copy } from '@std/fs';
 import { join } from '@std/path/join';
-import { assertEquals } from 'jsr:@std/assert';
 import { BatchExport } from '../src/batch/BatchExport.ts';
 import { convertToSimpleLocalizeFormat } from '../src/convert/convertToSimpleLocalizeFormat.ts';
 import { splitByMaxLeafNodesOrThrow } from '../src/util/splitByMaxLeafNodes.ts';

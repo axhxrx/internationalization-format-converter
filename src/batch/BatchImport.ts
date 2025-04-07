@@ -98,9 +98,13 @@ export class BatchImport
       logger.debug('BATCH', 'Processing path:', possiblyRelativePath);
       logger.debug('BATCH', 'Root path:', rootPath);
 
+      const fileExtensionToAppend = this.importOptions.simpleLocalizeFormat
+        ? '.i18n.ts'
+        : '';
+
       const path = isAbsolute(possiblyRelativePath)
-        ? possiblyRelativePath
-        : join(rootPath ?? Deno.cwd(), possiblyRelativePath);
+        ? possiblyRelativePath + fileExtensionToAppend
+        : join(rootPath ?? Deno.cwd(), possiblyRelativePath + fileExtensionToAppend);
 
       const jsonObjectForPath = this.jsonPathMap[possiblyRelativePath];
 

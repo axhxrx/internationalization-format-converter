@@ -1,4 +1,4 @@
-import { assertArrayIncludes, assertEquals } from 'jsr:@std/assert';
+import { assertArrayIncludes, assertEquals } from '@std/assert';
 import { merge, mergeAll } from '../src/util/merge.ts';
 
 Deno.test('mergeAll with empty array', () =>

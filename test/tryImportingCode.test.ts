@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert';
+import { assertEquals } from '@std/assert';
 import { tryImportingCode } from '../src/ast/tryImportingCode.ts';
 
 Deno.test('tryImportingCode works with source code', async () =>

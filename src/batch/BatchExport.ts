@@ -190,9 +190,13 @@ export class BatchExport
     const entries = Object.entries(this.inputs);
     for (const [_path, result] of entries)
     {
-      const path = this.exportOptions.rootDir
+      const initialPath = this.exportOptions.rootDir
         ? relative(this.exportOptions.rootDir, _path)
         : _path;
+
+      const path = this.exportOptions.simpleLocalizeFormat
+        ? this.makeSimpleLocalizeSafeFilename(initialPath)
+        : initialPath;
 
       if (result.state === 'error')
       {
@@ -202,6 +206,13 @@ export class BatchExport
       else if (result.state === 'skipped')
       {
         continue;
+      }
+      else if (path.includes('.') && this.exportOptions.simpleLocalizeFormat)
+      {
+        result.state = 'error';
+        result.error = new Error(
+          `SimpleLocalize format does not support keys containing ".", and even with file extension removed, top-level key for "${initialPath}" would be "${path}" which is invalid`,
+        );
       }
       else
       {
@@ -230,11 +241,25 @@ export class BatchExport
       }
     }
 
-    console.log('Successfully exported JSON for', this.successCount, 'files');
-    console.log(this);
+    // console.log('Successfully exported JSON for', this.successCount, 'files');
+    // console.log(this);
 
     return error
       ? { ...this, state: 'error', error }
       : { ...this, state: 'complete', json, jsonObject };
+  }
+
+  protected makeSimpleLocalizeSafeFilename(filename: string): string
+  {
+    const extensions = this.searchOptions.fileExtensions;
+    let newFileName = filename;
+    for (const extension of extensions)
+    {
+      if (filename.endsWith(extension))
+      {
+        newFileName = filename.replace(extension, '');
+      }
+    }
+    return newFileName;
   }
 }

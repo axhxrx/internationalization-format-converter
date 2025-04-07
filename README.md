@@ -1,10 +1,10 @@
 # @axhxrx/internationalization-format-converter
 
-## WIP
+## WIP (!)
 
 This library is a WIP hack for converting between TypeScript localization files (as defined by [@axhxrx/internationalization](https://jsr.io/@axhxrx/internationalization)) and JSON.
 
-It's still at the is-it-workable ideation stage, so you probably shouldn't use it yet. 
+It's still at the "is this even workable?" ideation stage, so you probably shouldn't use it yet. 
 
 The purpose here is to be able to use the TypeScript format defined by [@axhxrx/internationalization](https://jsr.io/@axhxrx/internationalization), but automate integrations with other services, which generally only support JSON. This library can (at least sometimes) convert the `.ts` format to JSON, and then update the original `.ts` file with the changes from newer JSON files.
 
@@ -34,23 +34,23 @@ The tool provides a command-line interface for converting between formats:
 export MOD="https://jsr.io/@axhxrx/internationalization-format-converter/0.0.1/mod.ts"
 
 # Export a TypeScript file to JSON
-deno run -RWE --unstable-sloppy-imports $MOD export path/to/file.i18n.ts output.json
+deno run -RWE $MOD export path/to/file.i18n.ts output.json
 
 # Import translations from JSON back to TypeScript
-deno run -RWE --unstable-sloppy-imports $MOD import input.json path/to/file.i18n.ts
+deno run -RWE $MOD import input.json path/to/file.i18n.ts
 
 # Export with file path as the root identifier
-deno run -RWE --unstable-sloppy-imports $MOD export path/to/file.i18n.ts output.json --derive
+deno run -RWE $MOD export path/to/file.i18n.ts output.json --derive
 
 # Export with a custom root identifier
-deno run -RWE --unstable-sloppy-imports $MOD export path/to/file.i18n.ts output.json --identifier=customName
+deno run -RWE $MOD export path/to/file.i18n.ts output.json --identifier=customName
 
 # Preview changes without writing files (dry run)
-deno run -RWE --unstable-sloppy-imports $MOD import input.json path/to/file.i18n.ts --dry-run
-deno run -RWE --unstable-sloppy-imports $MOD export path/to/file.i18n.ts output.json --dry-run
+deno run -RWE $MOD import input.json path/to/file.i18n.ts --dry-run
+deno run -RWE $MOD export path/to/file.i18n.ts output.json --dry-run
 
 # Display help
-deno run -RWE --unstable-sloppy-imports $MOD help
+deno run -RWE $MOD help
 ```
 
 ### API
@@ -91,4 +91,5 @@ MIT
 
 ## Happenings
 
+2025-04-14: Add hack WIP roundtrip export-import to/from SimpleLocalize SaaS (but this normally wouldn't be published yet, I'm pushing the dirty WIP so that we can invoke it in CI direct from JSR)
 2025-04-07: Published version 0.0.5, still rough but usable in some cases

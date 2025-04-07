@@ -1,5 +1,5 @@
+import { assert, assertEquals } from '@std/assert';
 import { join } from '@std/path';
-import { assert, assertEquals } from 'jsr:@std/assert';
 import { loadLocalizationFromFileOrThrow } from '../src/ast/loadLocalizationFromFile.ts';
 import { importJSONOrThrow } from '../src/convert/importJSONOrThrow.ts';
 

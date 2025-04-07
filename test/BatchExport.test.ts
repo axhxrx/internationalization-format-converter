@@ -1,5 +1,5 @@
+import { assertEquals } from '@std/assert';
 import { join } from '@std/path/join';
-import { assertEquals } from 'jsr:@std/assert';
 import { BatchExport } from '../src/batch/BatchExport.ts';
 import { assertTextFilesEqual } from './assertTextFilesEqual.ts';
 

@@ -1,6 +1,6 @@
 import { join } from '@std/path';
 
-import { assert, assertGreater } from 'jsr:@std/assert';
+import { assert, assertGreater } from '@std/assert';
 
 import { loadLocalizationFromFileOrThrow } from '../src/ast/loadLocalizationFromFile.ts';
 import { stripImports } from '../src/ast/stripImports.ts';

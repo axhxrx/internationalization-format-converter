@@ -1,6 +1,6 @@
 import { join } from '@std/path';
 
-import { assert } from 'jsr:@std/assert';
+import { assert } from '@std/assert';
 
 import { stripImports } from '../src/ast/stripImports.ts';
 import { tryImportingCode } from '../src/ast/tryImportingCode.ts';

@@ -1,4 +1,4 @@
-import { assert, assertEquals } from 'jsr:@std/assert';
+import { assert, assertEquals } from '@std/assert';
 
 import { stripImports } from '../src/ast/stripImports.ts';
 import { tryImportingCode } from '../src/ast/tryImportingCode.ts';
