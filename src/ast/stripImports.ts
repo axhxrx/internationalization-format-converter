@@ -81,6 +81,12 @@ function removeImportsAndUsages(sourceFile: ts.SourceFile): ts.SourceFile
           return undefined;
         }
 
+        // Remove export declarations that re-export from other modules
+        if (ts.isExportDeclaration(node) && node.moduleSpecifier)
+        {
+          return undefined;
+        }
+
         // Remove type alias declarations
         if (ts.isTypeAliasDeclaration(node))
         {
@@ -139,6 +145,27 @@ function removeImportsAndUsages(sourceFile: ts.SourceFile): ts.SourceFile
         if (ts.isShorthandPropertyAssignment(node) && importedIdentifiers.has(node.name.text))
         {
           return undefined;
+        }
+
+        // Handle spread assignments in object literals
+        if (ts.isSpreadAssignment(node))
+        {
+          const expression = node.expression;
+          if (isImportedReference(expression))
+          {
+            return undefined; // Remove spread assignment if it references an imported identifier
+          }
+
+          const visitedExpression = ts.visitNode(expression, visit) as ts.Expression | undefined;
+          if (!visitedExpression)
+          {
+            return undefined;
+          }
+          if (visitedExpression !== expression)
+          {
+            return factory.createSpreadAssignment(visitedExpression);
+          }
+          return node;
         }
 
         // Handle object literals

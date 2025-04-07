@@ -87,3 +87,19 @@ Deno.test('stripImports regression test ', async () =>
     + `Source code:\n${result.sourceCode}\n`
     + `Error: ${result.error?.message ?? 'unknown error'}`);
 });
+
+Deno.test('stripImports removes re-exports', async () =>
+{
+  const modulePath = pathToFixtures + 'reexports.i18n.ts';
+  const fileContents = await Deno.readTextFile(modulePath);
+  const strippedContents = await stripImports(fileContents);
+
+  const expected = Deno.readTextFileSync(pathToFixtures + 'reexports.i18n.stripped.ts');
+  assertEquals(strippedContents, expected);
+
+  // Also verify it produces valid code
+  const result = await tryImportingCode({ sourceCode: strippedContents });
+  assert(result.success, `Failed to generate valid code when stripping ${modulePath}.\n`
+    + `Source code:\n${result.sourceCode}\n`
+    + `Error: ${result.error?.message ?? 'unknown error'}`);
+});

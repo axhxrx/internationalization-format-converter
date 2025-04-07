@@ -77,7 +77,7 @@ export const loadLocalizationFromFileOrThrow = async (
 
   if (!isLocalization(importResult.module))
   {
-    console.error(`loadLocalizationFromFile: Invalid i18n structure: ${filePath}`);
+    console.error(`loadLocalizationFromFile: Invalid i18n structure: ${filePath}`, JSON.stringify(importResult.module));
     throw new Error(`loadLocalizationFromFile: Invalid i18n structure`);
   }
 
