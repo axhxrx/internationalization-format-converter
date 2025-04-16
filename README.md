@@ -91,5 +91,6 @@ MIT
 
 ## Happenings
 
+2025-04-16: Fix a bug in the WIP SimpleLocalize export/import where "foo.i18n.ts" files would be processed but "i18n.ts" files would be skipped.
 2025-04-14: Add hack WIP roundtrip export-import to/from SimpleLocalize SaaS (but this normally wouldn't be published yet, I'm pushing the dirty WIP so that we can invoke it in CI direct from JSR)
 2025-04-07: Published version 0.0.5, still rough but usable in some cases
