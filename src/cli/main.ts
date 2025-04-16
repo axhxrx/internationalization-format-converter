@@ -143,7 +143,7 @@ export async function main(testArgs?: string | string[], useCwd?: string): Promi
       // Get file extensions to search for, default to .i18n.ts if not specified
       const fileExtensions = args.ext && (args.ext as string[]).length > 0
         ? args.ext as string[]
-        : ['.i18n.ts'];
+        : ['i18n.ts'];
 
       const limit = args.limit ? Number(args.limit) : 0;
 

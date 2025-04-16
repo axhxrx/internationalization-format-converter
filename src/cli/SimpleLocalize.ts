@@ -112,7 +112,7 @@ export async function main(): Promise<number>
   exitStatus = await batchExportWithOptions({
     rootDir,
     outputFile: outputFile,
-    fileExtensions: ['.i18n.ts'],
+    fileExtensions: ['i18n.ts'],
     dryRun: false,
     simpleLocalizeFormat: true,
   });
@@ -279,7 +279,7 @@ async function buildConfig(): Promise<ArgsAndConfig>
 
   let _apiKey = args['api-key'];
   const _rootDir = args.root ?? Deno.cwd();
-  const _fileExtension = args.extension || '.i18n.ts';
+  const _fileExtension = args.extension || 'i18n.ts';
 
   const overrideConfig: Partial<InferBaseConfig<typeof defaultConfig>> = {};
 

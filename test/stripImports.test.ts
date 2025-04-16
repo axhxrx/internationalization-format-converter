@@ -53,7 +53,7 @@ Deno.test('stripImports with multi import produces importable code', async () =>
 
 Deno.test('stripImports with nested translation definitions produces importable code', async () =>
 {
-  const modulePath = pathToFixtures + 'hoge.nested.i18n.ts';
+  const modulePath = pathToFixtures + 'hoge_nested.i18n.ts';
   const fileContents = await Deno.readTextFile(modulePath);
   const strippedContents = await stripImports(fileContents);
 

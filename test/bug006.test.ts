@@ -16,8 +16,8 @@ Deno.test('Spitballing the batch export/import process', async () =>
   const tmpDir = await Deno.makeTempDir();
 
   const files = [
-    'insane-file-extensionless-import.ts',
-    'hoge.nested.i18n.ts',
+    'insane-file-extensionless-import.i18n.ts',
+    'hoge_nested.i18n.ts',
     'foo.i18n.ts',
     'bar.i18n.ts',
   ];
@@ -29,10 +29,10 @@ Deno.test('Spitballing the batch export/import process', async () =>
     await Deno.copyFile(src, dst);
   }
 
-  const rootPath = join(tmpDir, 'insane-file-extensionless-import.ts');
+  const rootPath = join(tmpDir, 'insane-file-extensionless-import.i18n.ts');
   const rootSourceCode = await Deno.readTextFile(rootPath);
 
-  const hogePath = join(tmpDir, 'hoge.nested.i18n.ts');
+  const hogePath = join(tmpDir, 'hoge_nested.i18n.ts');
   const hogeSourceCode = await Deno.readTextFile(hogePath);
 
   const fooPath = join(tmpDir, 'foo.i18n.ts');
@@ -127,7 +127,7 @@ Deno.test('Spitballing the batch export/import process', async () =>
   console.log('Mods:', mods);
 
   await assertTextFilesEqual(rootPath, join(pathToFixtures, 'insane-file-extensionless-import.modified.ts'));
-  await assertTextFilesEqual(hogePath, join(pathToFixtures, 'hoge.nested.i18n.modified.ts'));
+  await assertTextFilesEqual(hogePath, join(pathToFixtures, 'hoge_nested.i18n.modified.ts'));
   await assertTextFilesEqual(fooPath, join(pathToFixtures, 'foo.i18n.modified.ts'));
   await assertTextFilesEqual(barPath, join(pathToFixtures, 'bar.i18n.modified.ts'));
 

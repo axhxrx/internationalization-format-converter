@@ -117,9 +117,11 @@ function findAndModify(
 
     // If not found in direct properties or any spread assignments, then it's truly not found.
     throw new Error(
-      `Property '${currentKey}' not found in object literal or its spread assignments. Path: ${path.join(
-        '.',
-      )}. Object text: ${objectLiteral.getText().substring(0, 100)}...`, // Added object text for context
+      `Property '${currentKey}' not found in object literal or its spread assignments. Path: ${
+        path.join(
+          '.',
+        )
+      }. Object text: ${objectLiteral.getText().substring(0, 100)}...`, // Added object text for context
     );
   }
 
@@ -311,7 +313,7 @@ export function applyDifferencesUsingASTOrThrow(
     //   },
     // } as const;
 
-    // import { hoge } from './hoge.nested.i18n';
+    // import { hoge } from './hoge_nested.i18n';
 
     // const barI18n = {
     //   name: {

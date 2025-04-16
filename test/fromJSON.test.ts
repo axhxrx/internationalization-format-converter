@@ -8,7 +8,7 @@
 // const fooInputFile = pathToFixtures + 'foo.i18n.ts';
 // const barInputFile = pathToFixtures + 'bar.i18n.ts';
 // const bazInputFile = pathToFixtures + 'baz.i18n.ts';
-// const hogeInputFile = pathToFixtures + 'hoge.nested.i18n.ts';
+// const hogeInputFile = pathToFixtures + 'hoge_nested.i18n.ts';
 
 // const pathToOriginalTypeScriptFile = pathToFixtures + 'baz.i18n.ts';
 // const pathToUneditedJSONFile = pathToFixtures + 'baz.i18n.json';
@@ -21,12 +21,12 @@
 //   await Deno.copyFile(fooInputFile, join(tmpDir, 'foo.i18n.ts'));
 //   await Deno.copyFile(barInputFile, join(tmpDir, 'bar.i18n.ts'));
 //   await Deno.copyFile(bazInputFile, join(tmpDir, 'baz.i18n.ts'));
-//   await Deno.copyFile(hogeInputFile, join(tmpDir, 'hoge.nested.i18n.ts'));
+//   await Deno.copyFile(hogeInputFile, join(tmpDir, 'hoge_nested.i18n.ts'));
 
 //   const foo = await loadLocalizationFromFileOrThrow(join(tmpDir, 'foo.i18n.ts'), { derive: true });
 //   const bar = await loadLocalizationFromFileOrThrow(join(tmpDir, 'bar.i18n.ts'), { derive: true });
 //   const baz = await loadLocalizationFromFileOrThrow(join(tmpDir, 'baz.i18n.ts'), { derive: true });
-//   const hoge = await loadLocalizationFromFileOrThrow(join(tmpDir, 'hoge.nested.i18n.ts'), { derive: true });
+//   const hoge = await loadLocalizationFromFileOrThrow(join(tmpDir, 'hoge_nested.i18n.ts'), { derive: true });
 //   const all = {
 //     ...foo.module,
 //     ...bar.module,
@@ -50,7 +50,7 @@
 //   assert(bazJSONPath.endsWith('baz.i18n.ts'));
 
 //   const hogeJSONPath = paths[3];
-//   assert(hogeJSONPath.endsWith('hoge.nested.i18n.ts'));
+//   assert(hogeJSONPath.endsWith('hoge_nested.i18n.ts'));
 
 //   const fooJSON = all[fooJSONPath];
 //   const barJSON = all[barJSONPath];
@@ -68,15 +68,15 @@
 //   bazJSON.baz.favorite.food.en = 'sushi';
 //   bazJSON.baz.favorite.food.ja = '寿司';
 
-//   hogeJSON.hoge.nested2.moreDeeplyNested.wowser.en = 'w00t w00t';
-//   hogeJSON.hoge.nested2.moreDeeplyNested.wowser.ja = 'わほー';
+//   hogeJSON.hoge_nested2.moreDeeplyNested.wowser.en = 'w00t w00t';
+//   hogeJSON.hoge_nested2.moreDeeplyNested.wowser.ja = 'わほー';
 
 //   // Now we have made the above changes to the in-memory JSON structure. This simulates having read in a bunch of JSON files and building one structure out of them. The final step is to apply the changes back to the source code.
 
 //   const fooTs = await Deno.readTextFile(pathToFixtures + 'foo.i18n.ts');
 //   const barTs = await Deno.readTextFile(pathToFixtures + 'bar.i18n.ts');
 //   const bazTs = await Deno.readTextFile(pathToFixtures + 'baz.i18n.ts');
-//   const hogeTs = await Deno.readTextFile(pathToFixtures + 'hoge.nested.i18n.ts');
+//   const hogeTs = await Deno.readTextFile(pathToFixtures + 'hoge_nested.i18n.ts');
 
 //   const fooTsUpdated = await importJSONOrThrow(JSON.stringify(fooJSON), fooTs);
 //   const barTsUpdated = await importJSONOrThrow(JSON.stringify(barJSON), barTs);

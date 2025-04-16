@@ -98,16 +98,24 @@ export class BatchImport
       logger.debug('BATCH', 'Processing path:', possiblyRelativePath);
       logger.debug('BATCH', 'Root path:', rootPath);
 
+      // FIXME: Instead of hardcodind 'i18n.ts', respect the CLI arguments
       const fileExtensionToAppend = this.importOptions.simpleLocalizeFormat
-        ? '.i18n.ts'
+        ? 'i18n.ts'
         : '';
 
-      const path = isAbsolute(possiblyRelativePath)
-        ? possiblyRelativePath + fileExtensionToAppend
-        : join(rootPath ?? Deno.cwd(), possiblyRelativePath + fileExtensionToAppend);
+      const fileExtensionToAppendWithDot = fileExtensionToAppend === '' || fileExtensionToAppend.startsWith('.')
+        ? fileExtensionToAppend
+        : `.${fileExtensionToAppend}`;
+
+      const basePath = isAbsolute(possiblyRelativePath)
+        ? possiblyRelativePath
+        : join(rootPath ?? Deno.cwd(), possiblyRelativePath);
+
+      const path = basePath === '' || basePath.endsWith('/')
+        ? basePath + fileExtensionToAppend
+        : basePath + fileExtensionToAppendWithDot;
 
       const jsonObjectForPath = this.jsonPathMap[possiblyRelativePath];
-
       if (!isLocalization(jsonObjectForPath))
       {
         this.inputs[path] = new ImportResult(path, '', {}, '', '', 'Invalid i18n structure');

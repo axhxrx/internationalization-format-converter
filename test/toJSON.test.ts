@@ -120,7 +120,7 @@ Deno.test('toJSON with multiple files and derived file path-based identifiers', 
 
 Deno.test('to JSON with nested references to imported entities', async () =>
 {
-  const inputFile = pathToFixtures + 'hoge.nested.i18n.ts';
+  const inputFile = pathToFixtures + 'hoge_nested.i18n.ts';
   const result = await loadLocalizationFromFileOrThrow(inputFile);
 
   // No type help here; cannot be helped, though — we import unknown data at runtime, so nothing we can do at build time

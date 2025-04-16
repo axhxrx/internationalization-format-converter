@@ -7,8 +7,8 @@ const pathToParent = './test'; // = new URL('.', import.meta.url).pathname;
 
 const path1 = join(pathToParent, 'fixtures', 'foo.i18n.ts');
 const path2 = join(pathToParent, 'fixtures', 'bar.i18n.ts');
-const path3 = join(pathToParent, 'fixtures', 'hoge.nested.i18n.ts');
-const path4 = join(pathToParent, 'fixtures', 'insane-file-extensionless-import.ts');
+const path3 = join(pathToParent, 'fixtures', 'hoge_nested.i18n.ts');
+const path4 = join(pathToParent, 'fixtures', 'insane-file-extensionless-import.i18n.ts');
 const path5 = join(pathToParent, 'fixtures', 'collection', 'libs', 'user-console', 'feature', 'connect-web-console',
   'src', 'lib', 'feature-connect-web-console', 'i18n.ts');
 

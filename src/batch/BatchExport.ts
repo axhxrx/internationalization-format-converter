@@ -37,7 +37,7 @@ interface ExportOptions
 }
 
 const defaultSearchOptions: SearchOptions = {
-  fileExtensions: ['.i18n.ts'],
+  fileExtensions: ['i18n.ts'],
   skip: [/node_modules/, /.git/],
 };
 
@@ -82,9 +82,18 @@ export class BatchExport
     const resolvedSearchOptions = searchOptions || defaultSearchOptions;
     const resolvedExportOptions = { ...exportOptions, rootDir: root };
 
+    // Dynamically build regexes for each extension
+    const match = resolvedSearchOptions.fileExtensions.flatMap(ext =>
+    {
+      const escapedExt = ext.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return [
+        new RegExp(`(^|[\\/])${escapedExt}$`), // matches .../i18n.ts
+        new RegExp(`(^|[\\/])[^\\/]+\\.${escapedExt}$`), // matches .../foo.i18n.ts
+      ];
+    });
+
     const a = await Array.fromAsync(walk(root, {
-      exts: resolvedSearchOptions.fileExtensions,
-      // match: [/^i18n\.ts$/, /^.+\.i18n\.ts$/],
+      match,
       includeDirs: false,
       skip: resolvedSearchOptions.skip,
     }));
@@ -198,21 +207,23 @@ export class BatchExport
         ? this.makeSimpleLocalizeSafeFilename(initialPath)
         : initialPath;
 
+      if (path.includes('.') && this.exportOptions.simpleLocalizeFormat)
+      {
+        result.state = 'error';
+        result.error = new Error(
+          `SimpleLocalize format does not support keys containing ".", and even with file extension removed, top-level key for "${initialPath}" would be "${path}" which is invalid`,
+        );
+      }
+
       if (result.state === 'error')
       {
+        console.error(result.error || 'unknown error');
         error = result.error;
         break;
       }
       else if (result.state === 'skipped')
       {
         continue;
-      }
-      else if (path.includes('.') && this.exportOptions.simpleLocalizeFormat)
-      {
-        result.state = 'error';
-        result.error = new Error(
-          `SimpleLocalize format does not support keys containing ".", and even with file extension removed, top-level key for "${initialPath}" would be "${path}" which is invalid`,
-        );
       }
       else
       {
@@ -253,10 +264,17 @@ export class BatchExport
   {
     const extensions = this.searchOptions.fileExtensions;
     let newFileName = filename;
+
     for (const extension of extensions)
     {
-      if (filename.endsWith(extension))
+      const extensionWithDot = extension.startsWith('.') ? extension : '.' + extension;
+      if (filename.endsWith(extensionWithDot))
       {
+        newFileName = filename.replace(extensionWithDot, '');
+      }
+      else if (filename.endsWith(extension))
+      {
+        // Handle file name is like "i18n.ts"
         newFileName = filename.replace(extension, '');
       }
     }

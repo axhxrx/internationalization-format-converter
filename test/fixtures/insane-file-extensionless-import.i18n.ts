@@ -5,7 +5,7 @@ const fooI18n = {
   },
 } as const;
 
-import { hoge } from './hoge.nested.i18n';
+import { hoge } from './hoge_nested.i18n';
 
 const barI18n = {
   name: {

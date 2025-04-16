@@ -35,7 +35,7 @@
       }
     }
   },
-  "test/fixtures/hoge.nested.i18n.ts": {
+  "test/fixtures/hoge_nested.i18n.ts": {
     "hoge": {
       "favorite": {
         "food": {
@@ -63,7 +63,7 @@
       }
     }
   },
-  "test/fixtures/insane-file-extensionless-import.ts": {
+  "test/fixtures/insane-file-extensionless-import.i18n.ts": {
     "derpola": {
       "fooI18n": {
         "name": {

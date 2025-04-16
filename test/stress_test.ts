@@ -15,7 +15,7 @@ Deno.test('Stress test on real-world files', async () =>
   // Use walk from @std/fs to recursively iterate through all files in the directory
   for await (const entry of walk(pathToCollection))
   {
-    if (entry.isFile && entry.name.endsWith('.i18n.ts'))
+    if (entry.isFile && entry.name.endsWith('i18n.ts'))
     {
       try
       {
@@ -41,6 +41,6 @@ Deno.test('Stress test on real-world files', async () =>
   // console.log('Errors:', errors);
 
   // Assert the expected number of files
-  console.log(`Found ${jsonOutputs.length} .i18n.ts files`);
-  assertEquals(jsonOutputs.length, 313);
+  console.log(`Found ${jsonOutputs.length} i18n.ts files`);
+  assertEquals(jsonOutputs.length, 351);
 });

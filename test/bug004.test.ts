@@ -15,7 +15,7 @@ Deno.test('Regression test for in-editor test running (vs unstable-sloppy-import
   // Update: Maybe we can, but not "easily" 😅
   // Therefore, this test only passes when run with "--unstable-sloppy-imports" flag
 
-  const modulePath = join(pathToFixtures, 'insane-file-extensionless-import.ts');
+  const modulePath = join(pathToFixtures, 'insane-file-extensionless-import.i18n.ts');
 
   const x = await loadLocalizationFromFileOrThrow(modulePath);
   console.log('Loaded contents:', Deno.inspect(x, { depth: Infinity, colors: true }));

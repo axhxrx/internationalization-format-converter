@@ -7,8 +7,8 @@ const pathToParent = './test'; // = new URL('.', import.meta.url).pathname;
 
 const pathToOriginalFoo = join(pathToParent, 'fixtures', 'foo.i18n.ts');
 const pathToOriginalBar = join(pathToParent, 'fixtures', 'bar.i18n.ts');
-const pathToOriginalHoge = join(pathToParent, 'fixtures', 'hoge.nested.i18n.ts');
-const pathToOriginalInsane = join(pathToParent, 'fixtures', 'insane-file-extensionless-import.ts');
+const pathToOriginalHoge = join(pathToParent, 'fixtures', 'hoge_nested.i18n.ts');
+const pathToOriginalInsane = join(pathToParent, 'fixtures', 'insane-file-extensionless-import.i18n.ts');
 const pathToOriginalConnect = join(pathToParent, 'fixtures', 'collection', 'libs', 'user-console', 'feature',
   'connect-web-console', 'src', 'lib', 'feature-connect-web-console', 'i18n.ts');
 
@@ -39,9 +39,9 @@ async function runImportTest(pathMap: Record<string, string>, pathToTmpSourceDir
   const pathToExpectedFinalFoo = join(pathToParent, 'BatchImport.test.expected.outputs', 'normal', 'foo.i18n.ts');
   const pathToExpectedFinalBar = join(pathToParent, 'BatchImport.test.expected.outputs', 'normal', 'bar.i18n.ts');
   const pathToExpectedFinalHoge = join(pathToParent, 'BatchImport.test.expected.outputs', 'normal',
-    'hoge.nested.i18n.ts');
+    'hoge_nested.i18n.ts');
   const pathToExpectedFinalInsane = join(pathToParent, 'BatchImport.test.expected.outputs', 'normal',
-    'insane-file-extensionless-import.ts');
+    'insane-file-extensionless-import.i18n.ts');
   const pathToExpectedFinalConnect = join(
     pathToParent,
     'BatchImport.test.expected.outputs',
@@ -61,8 +61,8 @@ async function runImportTest(pathMap: Record<string, string>, pathToTmpSourceDir
 
   const pathToFinalFoo = join(pathToFinalOutputs, 'foo.i18n.ts');
   const pathToFinalBar = join(pathToFinalOutputs, 'bar.i18n.ts');
-  const pathToFinalHoge = join(pathToFinalOutputs, 'hoge.nested.i18n.ts');
-  const pathToFinalInsane = join(pathToFinalOutputs, 'insane-file-extensionless-import.ts');
+  const pathToFinalHoge = join(pathToFinalOutputs, 'hoge_nested.i18n.ts');
+  const pathToFinalInsane = join(pathToFinalOutputs, 'insane-file-extensionless-import.i18n.ts');
   const pathToFinalConnect = join(pathToFinalOutputs, 'collection', 'libs', 'user-console', 'feature',
     'connect-web-console', 'src', 'lib', 'feature-connect-web-console', 'i18n.ts');
 

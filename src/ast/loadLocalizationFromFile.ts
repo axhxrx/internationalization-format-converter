@@ -150,5 +150,36 @@ export function loadedModuleIsAcceptable(module: unknown): module is Localizatio
   {
     return false;
   }
-  return json === '{}';
+  if (json === '{}')
+  {
+    return true;
+  }
+
+  // Pathological case that sometimes happens in complex re-export situations:
+  // {"plan01sESim":{},"planP1ESim":{},"planX1ESim":{},"planUsEsim":{},"planX2Esim":{},"i18n":{"plans":{}},"i18nESim":{"plans":{"plan01s":{},"plan-US":{},"planP1":{},"planX1":{},"planX2":{}}}}
+
+  const everyLeafNodeIsEmptyObject = everyLeafIsEmptyObject(JSON.parse(json!));
+  return everyLeafNodeIsEmptyObject;
+}
+
+/*
+ * Recursively checks if every leaf node in the object is an empty object ({}).
+ */
+function everyLeafIsEmptyObject(obj: unknown): boolean
+{
+  if (typeof obj !== 'object' || obj === null)
+  {
+    // Primitive value, not an empty object
+    return false;
+  }
+
+  const keys = Object.keys(obj);
+  if (keys.length === 0)
+  {
+    // This is an empty object (leaf)
+    return true;
+  }
+
+  // For each property, recurse
+  return keys.every(key => everyLeafIsEmptyObject((obj as Record<string, unknown>)[key]));
 }

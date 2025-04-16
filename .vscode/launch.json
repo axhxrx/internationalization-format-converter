@@ -91,7 +91,7 @@
         "--simple-localize",
         "--derive",
         "foo.json",
-        "test/fixtures/insane-file-extensionless-import.ts"
+        "test/fixtures/insane-file-extensionless-import.i18n.ts"
       ],
       "attachSimplePort": 9229
     },
