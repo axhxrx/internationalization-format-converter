@@ -6,16 +6,21 @@ if (import.meta.main)
 }
 
 // Export public API
-export { convertFromSimpleLocalizeFormat } from './src/convert/convertFromSimpleLocalizeFormat.ts';
-export { convertToSimpleLocalizeFormat } from './src/convert/convertToSimpleLocalizeFormat.ts';
+export * from './src/convert/convertFromSimpleLocalizeFormat.ts';
+export * from './src/convert/convertToSimpleLocalizeFormat.ts';
 
 export { loadLocalizationFileContentsOrThrow as loadLocalizationFileContents,
   loadLocalizationFromFileOrThrow as loadLocalizationFromFile } from './src/ast/loadLocalizationFromFile.ts';
 
-export { importJSONFileOrThrow } from './src/convert/importJSONFileOrThrow.ts';
-export { importJSONOrThrow } from './src/convert/importJSONOrThrow.ts';
+export * from './src/convert/importJSONFileOrThrow.ts';
+export * from './src/convert/importJSONOrThrow.ts';
 
-export { exportToJSON } from './src/convert/exportToJSON.ts';
-export { exportToJSONFile } from './src/convert/exportToJSONFile.ts';
-export { importFromJSON } from './src/convert/importFromJSON.ts';
-export { importFromJSONFile } from './src/convert/importFromJSONFile.ts';
+export * from './src/convert/exportToJSON.ts';
+export * from './src/convert/exportToJSONFile.ts';
+export * from './src/convert/importFromJSON.ts';
+export * from './src/convert/importFromJSONFile.ts';
+
+export * from './src/batch/BatchExport.ts';
+export * from './src/batch/batchExportWithOptions.ts';
+export * from './src/batch/BatchImport.ts';
+export * from './src/batch/batchImportWithOptions.ts';
