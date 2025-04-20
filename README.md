@@ -91,6 +91,8 @@ MIT
 
 ## Happenings
 
+- 2025-04-20: (v0.0.9) Fix JSR publish lint errors
+
 - 2025-04-20: (v0.0.8) Fix exports in mod.ts
 
 - 2025-04-16: Fix a bug in the WIP SimpleLocalize export/import where "foo.i18n.ts" files would be processed but "i18n.ts" files would be skipped.

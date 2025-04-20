@@ -65,7 +65,7 @@ export class BatchExport
 
   state: 'new' | 'in progress' | 'complete' | 'error' = 'new';
 
-  get outputDir()
+  get outputDir(): string
   {
     return this.tmpDir;
   }
@@ -77,7 +77,7 @@ export class BatchExport
     root: string,
     exportOptions: ExportOptions,
     searchOptions?: SearchOptions,
-  )
+  ): Promise<BatchExport>
   {
     const resolvedSearchOptions = searchOptions || defaultSearchOptions;
     const resolvedExportOptions = { ...exportOptions, rootDir: root };
