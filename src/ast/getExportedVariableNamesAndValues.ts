@@ -49,3 +49,29 @@ export function getExportedVariableNamesAndValues(
 
   return results;
 }
+
+/**
+ Returns an array of objects representing all variable declarations in the given source file, regardless of whether they are exported or not. This is useful for resolving identifiers that might be used in spread syntax within exported objects.
+ */
+export function getAllVariableNamesAndValuesInFile(
+  sourceFile: ReturnType<Project['createSourceFile']>,
+): Array<{ name: string; value: Expression | undefined }>
+{
+  // Find ALL VariableStatements in the file
+  const allVarsInFile = sourceFile.getVariableStatements();
+
+  const results: Array<{ name: string; value: Expression | undefined }> = [];
+
+  allVarsInFile.forEach((stmt: VariableStatement) =>
+  {
+    stmt.getDeclarations().forEach((decl) =>
+    {
+      results.push({
+        name: decl.getName(),
+        value: decl.getInitializer(), // could be undefined if no initializer
+      });
+    });
+  });
+
+  return results;
+}
