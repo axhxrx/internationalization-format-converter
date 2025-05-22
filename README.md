@@ -91,6 +91,8 @@ MIT
 
 ## Happenings
 
+- 2025-05-22: (v0.0.10) Fix bug applying chnages back to nested objects created via `{...foo, ...bar}`
+
 - 2025-04-20: (v0.0.9) Fix JSR publish lint errors
 
 - 2025-04-20: (v0.0.8) Fix exports in mod.ts
