@@ -66,7 +66,6 @@ export const loadLocalizationFromFileOrThrow = async (
   const strippedTmpFile = await Deno.makeTempFile({ suffix: '.ts' });
   await Deno.writeTextFile(strippedTmpFile, code);
 
-  // Once we have stripped the imports, we can import the code using Deno just as a sanity-check. (We could not import it using Deno without stripping the imports first, though, because the code might use monorepo-specific imports that Deno doesn't know about.)
   const importResult = await tryImportingCode({ filePath: strippedTmpFile });
 
   if (!importResult.success)
@@ -75,12 +74,15 @@ export const loadLocalizationFromFileOrThrow = async (
     throw new Error(`Failed to import file ${filePath}: ${importResult.error?.message ?? 'unknown error'}`);
   }
 
+  // Initial validation after stripping and first import
   if (!loadedModuleIsAcceptable(importResult.module))
   {
-    console.error(`loadLocalizationFromFile: Invalid i18n structure: ${filePath}`, JSON.stringify(importResult.module));
-    throw new Error(`loadLocalizationFromFile: Invalid i18n structure`);
+    console.error(`loadLocalizationFromFile: Invalid i18n structure after initial import: ${filePath}`, JSON.stringify(importResult.module));
+    throw new Error(`loadLocalizationFromFile: Invalid i18n structure after initial import`);
   }
 
+  // The reimportResult is what we'll actually use, as tryImportingCode can return a slightly different structure
+  // (e.g. default export unwrapped) compared to a direct dynamic import if the original file had only a default export.
   const reimportResult = await tryImportingCode({ filePath: strippedTmpFile });
   if (!reimportResult.success)
   {
@@ -93,12 +95,15 @@ export const loadLocalizationFromFileOrThrow = async (
   if (!loadedModuleIsAcceptable(reimportResult.module))
   {
     throw new Error(
-      `loadLocalizationFromFile(): Failed to reimport file ${strippedTmpFile}: the imported code is not a valid Localization module`,
+      `loadLocalizationFromFile(): Failed to reimport file ${strippedTmpFile}: the imported code is not a valid Localization module after reimport`,
     );
   }
-  const bareModule: Localization<string> = reimportResult.module as Localization<string>;
+  const bareModule: WhoKnows = reimportResult.module as WhoKnows;
 
   await Deno.remove(strippedTmpFile);
+
+  // Recursively remove empty objects from the bare module before further processing
+  removeEmptyObjectsRecursively(bareModule);
 
   let rootPropertyName: string | undefined = undefined;
   if (typeof rootLevelIdentifier === 'object' && rootLevelIdentifier.derive)
@@ -111,75 +116,73 @@ export const loadLocalizationFromFileOrThrow = async (
     rootPropertyName = rootLevelIdentifier;
   }
 
-  const module = rootPropertyName != null
+  const moduleToProcess = rootPropertyName != null
     ? { [rootPropertyName]: bareModule }
     : bareModule;
+  
+  // If, after wrapping, the entire moduleToProcess itself became an empty object (e.g. bareModule was {} and no rootPropertyName)
+  // or if bareModule was {} and it's the only thing under rootPropertyName, then moduleToProcess might be like { root: {} }
+  // We need to ensure the final `module` variable reflects the cleaned state.
+  removeEmptyObjectsRecursively(moduleToProcess); 
 
-  const json = JSON.stringify(module, null, 2);
-
-  if (!loadedModuleIsAcceptable(module))
+  // Final check on the module that will be returned and stringified
+  if (!loadedModuleIsAcceptable(moduleToProcess))
   {
     throw new Error(
-      'loadLocalizationFromFile(): The derived result is not a valid Localization module: invalid i18n structure\n\n',
-      module,
+      'loadLocalizationFromFile(): The final processed module is not a valid Localization module: invalid i18n structure\n\n',
+      moduleToProcess,
     );
   }
-  return { module, originalCode, code, json };
+
+  const json = JSON.stringify(moduleToProcess, null, 2);
+  
+  return { module: moduleToProcess, originalCode, code, json };
 };
 
 /**
- Returns true if `isLocalization()` returns true **or** if the module is an empty object (which for our purposes means "empty localization")
+ * Recursively removes properties from an object if their value is an empty object (`{}`).
+ * This function mutates the passed object.
  */
-export function loadedModuleIsAcceptable(module: unknown): module is Localization<string>
-{
-  const _isLocalization = isLocalization(module);
-  if (_isLocalization)
-  {
-    return true;
-  }
-  if (typeof module !== 'object' || module === null)
-  {
-    return false;
-  }
-  let json: string | undefined;
-  try
-  {
-    json = JSON.stringify(module, null, 2);
-  }
-  catch (_error)
-  {
-    return false;
-  }
-  if (json === '{}')
-  {
-    return true;
-  }
-
-  // Pathological case that sometimes happens in complex re-export situations:
-  // {"plan01sESim":{},"planP1ESim":{},"planX1ESim":{},"planUsEsim":{},"planX2Esim":{},"i18n":{"plans":{}},"i18nESim":{"plans":{"plan01s":{},"plan-US":{},"planP1":{},"planX1":{},"planX2":{}}}}
-
-  const everyLeafNodeIsEmptyObject = everyLeafIsEmptyObject(JSON.parse(json!));
-  return everyLeafNodeIsEmptyObject;
-}
-
-/*
- * Recursively checks if every leaf node in the object is an empty object ({}).
- */
-function everyLeafIsEmptyObject(obj: unknown): boolean
+function removeEmptyObjectsRecursively(obj: unknown): void
 {
   if (typeof obj !== 'object' || obj === null)
   {
-    // Primitive value, not an empty object
-    return false;
+    return; // Not an object, or null
   }
 
-  const keys = Object.keys(obj);
-  if (keys.length === 0)
+  const currentObject = obj as Record<string, unknown>;
+  for (const key in currentObject)
   {
-    // This is an empty object (leaf)
+    if (Object.prototype.hasOwnProperty.call(currentObject, key))
+    {
+      const value = currentObject[key];
+      if (typeof value === 'object' && value !== null)
+      {
+        removeEmptyObjectsRecursively(value); // Recurse first
+        // After recursion, check if the child object is now empty
+        if (Object.keys(value).length === 0)
+        {
+          delete currentObject[key];
+        }
+      }
+    }
+  }
+}
+
+/**
+ Returns true if `isLocalization()` returns true **or** if the module is an empty object 
+ (which for our purposes means "empty localization" and is acceptable at certain stages).
+ */
+export function loadedModuleIsAcceptable(module: unknown): module is Localization<string>
+{
+  if (isLocalization(module))
+  {
     return true;
   }
-
-  // For each property, recurse
-  return keys.every(key => everyLeafIsEmptyObject((obj as Record<string, unknown>)[key]));
+  // Allow an entirely empty object {} as acceptable at intermediate steps
+  if (typeof module === 'object' && module !== null && Object.keys(module).length === 0)
+  {
+    return true;
+  }
+  return false;
 }

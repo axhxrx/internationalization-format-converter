@@ -34283,6 +34283,7 @@
     }
   },
   "libs/i18n/component/user-console/src/lib/user-console-master-translations.i18n.ts": {},
+  "libs/i18n/subscription-comparison/src/lib/i18n.ts": {},
   "libs/i18n/common/common.i18n.ts": {
     "bundles": {
       "en": "Bundles",
@@ -34588,25 +34589,6 @@
           "en": "An unexpected error has occurred. Sorry for any inconvenience.",
           "ja": "エラーが発生しました。ご不便をおかけし申し訳ございません。"
         }
-      }
-    }
-  },
-  "libs/i18n/subscription-comparison/src/lib/i18n.ts": {
-    "plan01sESim": {},
-    "planP1ESim": {},
-    "planX1ESim": {},
-    "planUsEsim": {},
-    "planX2Esim": {},
-    "i18n": {
-      "plans": {}
-    },
-    "i18nESim": {
-      "plans": {
-        "plan01s": {},
-        "plan-US": {},
-        "planP1": {},
-        "planX1": {},
-        "planX2": {}
       }
     }
   },

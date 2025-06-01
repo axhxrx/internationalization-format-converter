@@ -35,6 +35,8 @@ export async function tryImportingCode(options: ImportOptions): Promise<ImportRe
   let tempFile: string | undefined;
   let transpileResult: ts.TranspileOutput;
 
+  // console.log('options', options);
+
   try
   {
     // Get source code either directly or from file

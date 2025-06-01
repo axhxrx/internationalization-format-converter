@@ -46,24 +46,48 @@ function removeImportsAndUsages(sourceFile: ts.SourceFile): ts.SourceFile
   {
     const factory = context.factory;
 
-    // Helper to check if an expression references an imported identifier
-    function isImportedReference(expr: ts.Expression): boolean
+    // Helper to get the base identifier of an expression, drilling through wrappers and accessors.
+    function getBaseIdentifier(expr: ts.Expression): ts.Identifier | undefined
     {
-      if (ts.isIdentifier(expr))
+      let current = expr;
+      // Loop to drill down to the base identifier
+      // Handles common cases like obj.prop1.prop2, obj['prop1']['prop2'], (obj).prop1, func().prop1
+      while (true)
       {
-        return importedIdentifiers.has(expr.text);
-      }
-      if (ts.isPropertyAccessExpression(expr))
-      {
-        let current: ts.Expression = expr;
-        while (ts.isPropertyAccessExpression(current))
+        if (ts.isIdentifier(current))
+        {
+          return current;
+        }
+        else if (
+          ts.isPropertyAccessExpression(current) ||
+          ts.isElementAccessExpression(current) ||
+          ts.isParenthesizedExpression(current)
+        )
         {
           current = current.expression;
         }
-        if (ts.isIdentifier(current))
+        else if (ts.isCallExpression(current)) // e.g. ...getImportedObject().anotherProp or ...importedFunction()
         {
-          return importedIdentifiers.has(current.text);
+          // This traces to the function/method being called.
+          // If importedFunction() is spread, we care if importedFunction is imported.
+          // If obj.importedMethod() is spread, we care if obj is imported.
+          current = current.expression;
         }
+        else
+        {
+          // If it's not an identifier or a known wrapper/accessor/call, we can't find a base identifier.
+          return undefined;
+        }
+      }
+    }
+
+    // Helper to check if an expression references an imported identifier
+    function isImportedReference(expr: ts.Expression): boolean
+    {
+      const baseIdentifier = getBaseIdentifier(expr);
+      if (baseIdentifier)
+      {
+        return importedIdentifiers.has(baseIdentifier.text);
       }
       return false;
     }
@@ -124,85 +148,90 @@ function removeImportsAndUsages(sourceFile: ts.SourceFile): ts.SourceFile
         {
           const initializer = node.initializer;
 
+          // If the property assignment itself (e.g. `prop: importedVar`) refers to an import, remove it.
           if (isImportedReference(initializer))
           {
             return undefined;
           }
 
-          const visitedInitializer = ts.visitNode(initializer, visit) as ts.Expression | undefined;
-          if (!visitedInitializer)
+          // Otherwise, visit the initializer to see if IT contains things to remove (e.g. `prop: { ...importedSpread }`)
+          const visitedInitializer = visit(initializer) as ts.Expression | undefined;
+          if (!visitedInitializer) // Initializer was entirely removed (e.g. an object that became empty)
           {
-            return undefined;
+            return undefined; // Remove the property assignment too
           }
-          if (visitedInitializer !== initializer)
+          if (visitedInitializer !== initializer) // Initializer was changed
           {
             return factory.updatePropertyAssignment(node, node.name, visitedInitializer);
           }
-          return node;
+          return node; // Initializer unchanged, so property assignment is unchanged
         }
 
-        // Handle shorthand property assignments
+        // Handle shorthand property assignments (e.g. `{ importedVar }`)
         if (ts.isShorthandPropertyAssignment(node) && importedIdentifiers.has(node.name.text))
         {
           return undefined;
         }
 
-        // Handle spread assignments in object literals
+        // Handle spread assignments in object literals (e.g. `{ ...importedVar }`)
         if (ts.isSpreadAssignment(node))
         {
-          const expression = node.expression;
-          if (isImportedReference(expression))
+          if (isImportedReference(node.expression))
           {
             return undefined; // Remove spread assignment if it references an imported identifier
           }
-
-          const visitedExpression = ts.visitNode(expression, visit) as ts.Expression | undefined;
-          if (!visitedExpression)
-          {
-            return undefined;
-          }
-          if (visitedExpression !== expression)
-          {
-            return factory.createSpreadAssignment(visitedExpression);
-          }
+          // If the spread is not directly of an import (e.g. `...localObj` or `...localObj.prop`)
+          // we don't visit `node.expression` further because `stripImports` isn't meant to deeply
+          // clean local objects, only to sever connections to imports.
           return node;
         }
 
         // Handle object literals
         if (ts.isObjectLiteralExpression(node))
         {
-          const properties = node.properties
-            .map(prop => ts.visitNode(prop, visit))
-            .filter((prop): prop is ts.ObjectLiteralElementLike => prop !== undefined);
-
-          if (properties.length === 0)
+          let changed = false;
+          const newProperties: ts.ObjectLiteralElementLike[] = [];
+          for (const prop of node.properties)
           {
-            return undefined;
+            const visitedProp = visit(prop) as ts.ObjectLiteralElementLike | undefined;
+            if (visitedProp)
+            {
+              newProperties.push(visitedProp);
+            }
+            if (visitedProp !== prop) // If a property was removed or changed
+            {
+              changed = true;
+            }
           }
 
-          if (properties.length !== node.properties.length)
-          {
-            return factory.updateObjectLiteralExpression(node, properties);
+          if (!changed && newProperties.length === node.properties.length) {
+              return node; // No change to any properties
           }
-          return node;
+          
+          // If all properties were removed, the object literal itself might be removed depending on context.
+          // For example, if `export const foo = {}` and {} becomes empty, `tryImportingCode` might fail if `foo` is used elsewhere without definition.
+          // However, the current test case expects `placeholder` to remain, so `newProperties` won't be empty.
+          // If `newProperties` is empty, we create an empty object literal.
+          return factory.updateObjectLiteralExpression(node, factory.createNodeArray(newProperties));
         }
 
-        // Handle type assertion expressions (e.g., `as const`)
+        // Handle type assertion expressions (e.g., `... as const`)
         if (ts.isAsExpression(node))
         {
-          const expression = ts.visitNode(node.expression, visit) as ts.Expression;
-          if (!expression)
+          const visitedExpression = visit(node.expression) as ts.Expression | undefined;
+
+          if (!visitedExpression) // If the entire inner expression was removed (e.g. an object that became empty and was removed)
           {
-            return undefined;
+            return undefined; // Remove the 'as const' assertion as well
           }
-          if (expression !== node.expression)
+
+          if (visitedExpression !== node.expression) // If the inner expression was changed
           {
-            return factory.createAsExpression(expression, node.type);
+            return factory.updateAsExpression(node, visitedExpression, node.type);
           }
-          return node;
+          return node; // Inner expression unchanged, so AsExpression is unchanged
         }
 
-        // console.log(node, node.kind, ts.SyntaxKind[node.kind], node.getText(), (node as any).name?.text);
         return ts.visitEachChild(node, visit, context);
       }
 

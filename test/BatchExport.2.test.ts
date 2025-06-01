@@ -29,6 +29,10 @@ Deno.test('BatchExport works (large, default mode)', async () =>
   const expected = join(pathToEnclosingDir, 'test', 'fixtures', 'BatchExport.test2.expected.output.json');
   const actual = outputFile;
 
+  // console.log('expected', expected);
+  // console.log('actual', actual);
+  // throw new Error('test');
+
   await assertTextFilesEqual(expected, actual);
 
   const json = await Deno.readTextFile(actual);

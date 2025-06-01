@@ -1,0 +1,14 @@
+{
+  "test/fixtures/bug008/another.i18n.exclude.ts": {
+    "i18n": {
+      "keyOne": {
+        "en": "Lorem ipsum I II III",
+        "ja": "ほげホゲ I II III"
+      },
+      "keyOneLabel": {
+        "en": "Transitioning",
+        "ja": "変更中"
+      }
+    }
+  }
+}
