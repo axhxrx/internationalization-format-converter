@@ -11,7 +11,10 @@ import {
 import { logger } from '../util/Logger.ts';
 import { createTsProject } from './createTsProject.ts';
 import type { DiffResult } from './DiffResult.ts';
-import { getExportedVariableNamesAndValues } from './getExportedVariableNamesAndValues.ts';
+import {
+  getAllVariableNamesAndValuesInFile,
+  getExportedVariableNamesAndValues,
+} from './getExportedVariableNamesAndValues.ts';
 
 /**
  Local function to unwrap AsExpressions and TypeAssertions
@@ -38,6 +41,8 @@ function findAndModify(
   localDeclarations: Map<string, Expression>,
 ): boolean
 {
+  objExpr = unwrapExpression(objExpr);
+
   if (path.length === 0)
   {
     return false;
@@ -64,7 +69,9 @@ function findAndModify(
   if (objExpr.getKind() !== SyntaxKind.ObjectLiteralExpression)
   {
     throw new Error(
-      `Expected an object literal or reference to a local variable, got: ${SyntaxKind[objExpr.getKind()]}`,
+      `Expected an object literal or reference to a local variable, got: ${
+        SyntaxKind[objExpr.getKind()]
+      } after unwrapping`,
     );
   }
 
@@ -79,7 +86,7 @@ function findAndModify(
     let modifiedInSpread = false;
     for (const child of objectLiteral.getChildrenOfKind(SyntaxKind.SpreadAssignment))
     {
-      const spreadExpr = child.getExpression();
+      const spreadExpr = unwrapExpression(child.getExpression()); // Ensure spread expression itself is unwrapped
       // We expect the spread expression to be an identifier referencing a known local declaration
       if (spreadExpr.getKind() === SyntaxKind.Identifier)
       {
@@ -87,41 +94,59 @@ function findAndModify(
         const localValue = localDeclarations.get(identifierName);
         if (localValue)
         {
-          // Try to find and modify within the spread source object.
-          // IMPORTANT: Pass the original 'path', not 'remainingPath', because the currentKey
-          // is expected to be a property within the spread source object.
-          if (findAndModify(localValue, path, newValue, localDeclarations))
+          try
           {
-            modifiedInSpread = true;
-            break; // Found and modified, stop searching other spreads
+            logger.debug('AST', `[Spread Try] Searching for path '${path.join('.')}' in spread '${identifierName}'`);
+            // localValue will be unwrapped at the start of the recursive findAndModify call
+            if (findAndModify(localValue, path, newValue, localDeclarations))
+            {
+              modifiedInSpread = true;
+              break; // Found in this spread for the current path, no need to check other spreads.
+            }
+          }
+          catch (error)
+          {
+            if (error instanceof Error)
+            {
+              logger.debug('AST',
+                `[Spread Catch] Path '${
+                  path.join('.')
+                }' not found in spread '${identifierName}' (or other error during its processing): ${error.message}`);
+            }
+            else
+            {
+              logger.debug('AST',
+                `[Spread Catch] Path '${
+                  path.join('.')
+                }' not found in spread '${identifierName}' (or other error during its processing): Unknown error type`);
+            }
+            // Continue to the next spread assignment
           }
         }
         else
         {
-          // This might indicate an issue if a spread identifier isn't resolvable,
-          // but we'll allow the search to continue in other spreads or properties.
-          console.warn(`Spread identifier '${identifierName}' not found in local declarations.`);
+          logger.warn('AST', `Spread identifier '${identifierName}' not found in local declarations.`);
         }
       }
       else
       {
-        // Log if the spread expression isn't a simple identifier, as we don't handle complex spreads yet.
-        console.warn(`Spread assignment expression is not an identifier: ${SyntaxKind[spreadExpr.getKind()]}`);
+        logger.warn('AST',
+          `Spread assignment expression is not an identifier or simple expression: ${
+            SyntaxKind[spreadExpr.getKind()]
+          }`);
       }
     }
 
     if (modifiedInSpread)
     {
-      return true; // Modification was successful within a spread assignment
+      return true; // Modification was successful within a spread assignment for the current path
     }
 
-    // If not found in direct properties or any spread assignments, then it's truly not found.
+    // If not found in direct properties or any spread assignments, then it's truly not found for this object literal.
     throw new Error(
-      `Property '${currentKey}' not found in object literal or its spread assignments. Path: ${
-        path.join(
-          '.',
-        )
-      }. Object text: ${objectLiteral.getText().substring(0, 100)}...`, // Added object text for context
+      `Property '${currentKey}' not found in object literal (or its spreads). Path: ${path.join('.')}. Object text: ${
+        objectLiteral.getText().substring(0, 200)
+      }...`,
     );
   }
 
@@ -242,52 +267,30 @@ export function applyDifferencesUsingASTOrThrow(
 
   const appliedKeypaths: string[] = [];
 
+  const allVarsInScope = getAllVariableNamesAndValuesInFile(sourceFile);
   const localDeclarations = new Map<string, Expression>();
-  sourceFile.getVariableDeclarations().forEach(decl =>
+  for (const { name, value } of allVarsInScope)
   {
-    const name = decl.getName();
-    const initializer = decl.getInitializer();
-    if (initializer)
+    if (value)
     {
-      localDeclarations.set(name, unwrapExpression(initializer));
+      localDeclarations.set(name, value);
     }
-  });
+  }
 
-  // Find the exported constants
-  const exportedConsts = sourceFile.getVariableStatements().filter(stmt => stmt.isExported());
+  const exportedVarsForIteration = getExportedVariableNamesAndValues(sourceFile);
 
-  const exportedNamesAndValues = getExportedVariableNamesAndValues(sourceFile);
-
-  logger.info('AST', 'EXPORTED NAMES:', exportedNamesAndValues.map(e => e.name));
-
-  // HERE I NEED TO FIGURE OUT THE NAMES OF ALL EXPORTED VARIABLES
-  // diff is like:
-  // {
-  //   "foo.name.en": { left: "Mason", right: "Boatie McBoatface" },
-  //   "foo.name.ja": { left: "メイソン", right: "ボーティー マックボートフェイス" }
-  // }
-
-  // exportedNamesAndValues is like:
-  // [{name: 'foo', value: AsExpression}]
-
-  // 📖 OUTER LOOP: EXPORTED CONSTS
-  //
-  // We loop over the exported consts of the file, looking for a diff entry.
-  //
-  // This is not efficient, when you contemplate the diff being a huge diff generated by compating a combined JSON file for say, 500 files, with a single file (because we have the inner loops over every keyPath in the diff, below). However, we can fix that upstream of this method, because we can pare down the JSON to exclude unrelated translations. And it is actually desirable to be **able** to do the inefficient huge comparison of the "all translations vs one file", because that is useful for E2E tests of the entire system's integrity.
-
-  for (const exportedConst of exportedConsts)
+  // Iterate over each exported variable declaration found in the source file.
+  // For each keyPath in the diff, we check if it starts with the name of one of these exported variables.
+  for (const exportedVar of exportedVarsForIteration)
   {
-    logger.debug('AST', 'exportedConst', exportedConst.getText());
+    const name = exportedVar.name;
+    const declaration = sourceFile.getVariableDeclaration(name);
 
-    const declarations = exportedConst.getDeclarations();
-    logger.debug('AST', 'declarations', declarations.map(d => d.getText()));
-
-    const declaration = declarations[0];
-    // logger.debug('AST', 'declaration', declaration);
-
-    const name = declaration.getName();
-    logger.debug('AST', 'dec[0] name', name);
+    if (!declaration)
+    {
+      logger.warn('AST', `Could not find declaration for exported variable: ${name}`);
+      continue;
+    }
 
     const initializer = declaration.getInitializer();
     logger.debug('AST', 'initializer', initializer?.getKindName());
