@@ -91,6 +91,8 @@ MIT
 
 ## Happenings
 
+- 2025-06-01: (v0.0.10) Fix a bug where of spreads of sub-properties of imported entities would not be handled correctly (e.g. the first spread `{...foo.bar, baz: {hoge: {en: 'hoge', ja: 'ホゲ'}}}`)
+
 - 2025-04-20: (v0.0.9) Fix JSR publish lint errors
 
 - 2025-04-20: (v0.0.8) Fix exports in mod.ts
