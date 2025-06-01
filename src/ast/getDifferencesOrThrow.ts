@@ -1,7 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 
-import { isLocalization, isLocalizedUnit, type Localization } from '@axhxrx/internationalization';
-import { convertFromSimpleLocalizeFormat } from '../convert/convertFromSimpleLocalizeFormat.ts';
+import { isLocalizedUnit, type Localization } from '@axhxrx/internationalization';
 import logger from '../util/Logger.ts';
 import type { DiffResult } from './DiffResult.ts';
 import { loadLocalizationFileContentsOrThrow } from './loadLocalizationFromFile.ts';
