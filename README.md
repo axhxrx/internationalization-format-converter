@@ -91,9 +91,11 @@ MIT
 
 ## Happenings
 
-- 2025-06-01: (v0.0.11) Fix a bug where of spreads of sub-properties of imported entities would not be handled correctly (e.g. the first spread `{...foo.bar, baz: {hoge: {en: 'hoge', ja: 'ホゲ'}}}`)
+- 2025-06-01: (v0.0.12) Fix version number human error SNAFU (no changes except version number — 0.0.11 never actually existed 🤪)
 
-- 2025-05-22: (v0.0.10) Fix bug applying chnages back to nested objects created via `{...foo, ...bar}`
+- 2025-06-01: (v0.0.10) Fix a bug where of spreads of sub-properties of imported entities would not be handled correctly (e.g. the first spread `{...foo.bar, baz: {hoge: {en: 'hoge', ja: 'ホゲ'}}}`)
+
+- 2025-05-22: Fix bug applying chnages back to nested objects created via `{...foo, ...bar}`
 
 - 2025-04-20: (v0.0.9) Fix JSR publish lint errors
 
