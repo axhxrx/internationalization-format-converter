@@ -4,7 +4,7 @@
 
 This library is a WIP hack for converting between TypeScript localization files (as defined by [@axhxrx/internationalization](https://jsr.io/@axhxrx/internationalization)) and JSON.
 
-It's still at the "is this even workable?" ideation stage, so you probably shouldn't use it yet. 
+It's still at the "is this even workable?" ideation stage, so you probably shouldn't use it yet.
 
 The purpose here is to be able to use the TypeScript format defined by [@axhxrx/internationalization](https://jsr.io/@axhxrx/internationalization), but automate integrations with other services, which generally only support JSON. This library can (at least sometimes) convert the `.ts` format to JSON, and then update the original `.ts` file with the changes from newer JSON files.
 
@@ -90,6 +90,8 @@ I had intended to publish this on jsr.io, but after developing the initial WIP v
 MIT
 
 ## Happenings
+
+- 2025-09-13: bump version due to nonsense (no other changes)
 
 - 2025-06-01: (v0.0.12) Fix version number human error SNAFU (no changes except version number — 0.0.11 never actually existed 🤪)
 
